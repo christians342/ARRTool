@@ -15,9 +15,9 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import arr.utils.ProjectUtilities;
 
-public class ARRProjectRun extends AbstractHandler {
+public class ARRProjectHandler extends AbstractHandler {
 
-	public ARRProjectRun() {
+	public ARRProjectHandler() {
 	}
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -42,7 +42,7 @@ public class ARRProjectRun extends AbstractHandler {
 			MessageSystem.selectProjectFirst();
 			return false;
 		}
-		
+		projects.add(0, null);
 		if(ARRRun.run(projects))
 		{
 			MessageSystem.sucessfullyFinished();

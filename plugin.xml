@@ -24,11 +24,11 @@
          point="org.eclipse.ui.handlers">
       <handler
             commandId="Architecture_Rules_Recovery.commands.runCommandProject"
-            class="arr.ui.ARRProjectRun">
+            class="arr.ui.ARRProjectHandler">
       </handler>
       <handler
             commandId="Architecture_Rules_Recovery.commands.runCommandWorkspace"
-            class="arr.ui.ARRWorkspaceRun">
+            class="arr.ui.ARRWorkspaceHandler">
       </handler>
    </extension>
    

@@ -204,7 +204,7 @@ public class ARRDataView extends ViewPart {
 					MessageSystem.runProjectFirst();
 					return;
 				}
-				
+				projects.add(0, null);
 				if(ARRRun.run(projects))
 					MessageSystem.sucessfullyFinished();
 				

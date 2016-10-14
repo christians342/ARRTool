@@ -11,9 +11,9 @@ import org.eclipse.core.resources.IProject;
 import arr.utils.ProjectUtilities;
 
 
-public class ARRWorkspaceRun extends AbstractHandler{
+public class ARRWorkspaceHandler extends AbstractHandler{
 
-	public ARRWorkspaceRun() {
+	public ARRWorkspaceHandler() {
 	}
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
