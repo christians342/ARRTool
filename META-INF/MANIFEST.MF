@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Architecture Rule Recovery Tool
+Bundle-SymbolicName: ARRTool;singleton:=true
+Bundle-Version: 1.0.0.rc
+Bundle-Activator: arr.ui.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.text,
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.ui.ide;bundle-version="3.11.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Import-Package: org.eclipse.core.resources,
+ org.eclipse.jdt.core,
+ org.eclipse.jface.text,
+ org.eclipse.jface.text.source,
+ org.eclipse.ui.texteditor
+Bundle-ClassPath: lib/commons-io-2.4.jar,
+ lib/jdepend-2.9.1.jar,
+ lib/spmf.jar,
+ .
+Bundle-Vendor: UFRGS

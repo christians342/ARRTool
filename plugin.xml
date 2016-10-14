@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="Architecture Recovery Category"
+            id="Architecture_Rules_Recovery.commands.category">
+      </category>
+      <command
+            name="Run Architecture Rules Recovery on Project"
+            categoryId="Architecture_Rules_Recovery.commands.category"
+            id="Architecture_Rules_Recovery.commands.runCommandProject">
+      </command>
+            <command
+            name="Run Architecture Rules Recovery on Workspace"
+            categoryId="Architecture_Rules_Recovery.commands.category"
+            id="Architecture_Rules_Recovery.commands.runCommandWorkspace">
+      </command>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="Architecture_Rules_Recovery.commands.runCommandProject"
+            class="arr.ui.ARRProjectRun">
+      </handler>
+      <handler
+            commandId="Architecture_Rules_Recovery.commands.runCommandWorkspace"
+            class="arr.ui.ARRWorkspaceRun">
+      </handler>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="Architecture_Rules_Recovery.commands.runCommandProject"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+5">
+      </key>
+      <key
+            commandId="Architecture_Rules_Recovery.commands.runCommandWorkspace"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+6">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="true"
+            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
+            <command
+                  commandId="Architecture_Rules_Recovery.commands.runCommandProject"
+                  id="Architecture_Rules_Recovery.menus.runCommandP"
+                  label="Run Architecture Rules Recovery on Project"
+                  style="push"
+                  tooltip="Runs the Architecture Rules Recovery Plugin without fetching any file outside the selected project.">
+            </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="true"
+            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
+         <command
+               commandId="Architecture_Rules_Recovery.commands.runCommandWorkspace"
+               id="Architecture_Rules_Recovery.menus.runCommandW"
+               label="Run Architecture Rules Recovery on Workspace"
+               style="push"
+               tooltip="Runs the Architecture Rules Recovery Plugin fetching all files in the current workspace. (This does fetch the source code of files outside the selected project)">
+         </command>
+      </menuContribution>
+      
+   </extension>
+   
+   
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="Architecture_Rules_Recovery"
+            name="Architecture Recovery Category">
+      </category>
+      
+      <!--
+      <view
+            category="Architecture_Rules_Recovery"
+            class="arr.views.ARRView"
+            icon="icons/diagram.png"
+            id="architecture_rules_recovery.views.ARRView"
+            name="Architecture Rules Recovery Warnings View">
+      </view>
+      -->
+      
+      <view
+            category="Architecture_Rules_Recovery"
+            class="arr.ui.ARRDataView"
+            icon="icons/diagram.png"
+            id="architecture_rules_recovery.views.ARRDataView"
+            name="Architecture Rules Recovery Data View">
+      </view>
+   </extension>
+   <!--
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               id="architecture_rules_recovery.views.ARRDataView"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ui.views.ProblemView">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   -->
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+
+   <extension point="org.eclipse.core.resources.markers"
+         id="arr.marker"
+         name="ARR Marker">
+         <super type="org.eclipse.core.resources.textmarker"/>
+         <super type="org.eclipse.core.resources.marker"/>
+         <persistent value="true"/>
+   </extension> 
+    
+<!-- Annotation specification:- describes what the annotation will look like and its properties -->
+   <extension point="org.eclipse.ui.editors.markerAnnotationSpecification"
+     id="myannotationspecification"
+     name="Architecture Rules Recovery Annotations">
+
+     <specification
+		annotationType="arr.annotation"
+		label="Architecture Rules Recovery Annotations"
+		icon="icons/warning.png"
+		verticalRulerPreferenceKey="highlight.rulers.vertical"
+		textPreferenceKey="highlight.text"
+		colorPreferenceKey="highlight.color"
+		highlightPreferenceKey="highlight.background"
+		textPreferenceValue="false"
+		textStylePreferenceValue="NONE"
+		overviewRulerPreferenceKey="highlight.rulers.overview"
+		presentationLayer="4"
+		highlightPreferenceValue="true"
+		colorPreferenceValue="253,255,157"
+		verticalRulerPreferenceValue="true"
+		overviewRulerPreferenceValue="true"
+		textStylePreferenceKey="highlight.text.style"/>
+   </extension>
+
+<!-- Links the annotation spec to the marker -->
+   <extension point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerSeverity="0"
+            super="org.eclipse.ui.workbench.texteditor.info"
+            name="arr.annotation"
+            markerType="arr.markers.arrmarker"/>
+   </extension>
+   
+  <!-- define the marker updater class-->
+  <extension point="org.eclipse.ui.editors.markerUpdaters">
+      <updater
+            id="arr.MarkerUpdater"
+            class="arr.markers.MarkerUpdater"
+            markerType="arr.mymarkers.arrmarker">
+      </updater>
+  </extension>
+</plugin>
