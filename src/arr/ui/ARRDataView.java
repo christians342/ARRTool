@@ -32,6 +32,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
+import arr.apriori.Apriori;
 import arr.apriori.AprioriOutput;
 import arr.general.ARRJavaPackage;
 import arr.utils.FileUtilities;
@@ -205,7 +206,7 @@ public class ARRDataView extends ViewPart {
 					return;
 				}
 				projects.add(0, null);
-				if(ARRRun.run(projects))
+				if(Apriori.run(projects))
 					MessageSystem.sucessfullyFinished();
 				
 				return;
@@ -222,7 +223,7 @@ public class ARRDataView extends ViewPart {
 		        projects.addAll(Arrays.asList(ProjectUtilities.getProjectsFromWorkspace()));
 		        
 		        // Shows a message that tells that the code already finished
-		        if(ARRRun.run(projects))
+		        if(Apriori.run(projects))
 				MessageSystem.sucessfullyFinished();
 				
 		        return;

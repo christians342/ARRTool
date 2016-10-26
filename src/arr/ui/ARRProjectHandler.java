@@ -13,6 +13,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import arr.apriori.Apriori;
 import arr.utils.ProjectUtilities;
 
 public class ARRProjectHandler extends AbstractHandler {
@@ -43,7 +44,7 @@ public class ARRProjectHandler extends AbstractHandler {
 			return false;
 		}
 		projects.add(0, null);
-		if(ARRRun.run(projects))
+		if(Apriori.run(projects))
 		{
 			MessageSystem.sucessfullyFinished();
 			return true;

@@ -65,7 +65,7 @@ public class FileUtilities {
 			fw.write(",");
 			fw.write(String.valueOf(aOuts.get(i).getSuport()));
 			if((i+ 1) != aOuts.size())
-			fw.write("\n");;
+			fw.write("\n");
 		}
 		fw.close();
 	}

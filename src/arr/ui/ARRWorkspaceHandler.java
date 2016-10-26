@@ -8,6 +8,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 
+import arr.apriori.Apriori;
 import arr.utils.ProjectUtilities;
 
 
@@ -22,7 +23,7 @@ public class ARRWorkspaceHandler extends AbstractHandler{
         projects.addAll(Arrays.asList(ProjectUtilities.getProjectsFromWorkspace()));
         
         // Shows a message that tells that the code already finished
-        if(ARRRun.run(projects))
+        if(Apriori.run(projects))
         {
         	MessageSystem.sucessfullyFinished();
         	return true;
