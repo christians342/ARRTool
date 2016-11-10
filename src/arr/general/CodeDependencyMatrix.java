@@ -9,13 +9,13 @@ import jdepend.framework.JavaClass;
  * and M will be the number of packages
  */
 
-public class DependencyMatrix {
+public class CodeDependencyMatrix {
 	private boolean[][] matrix;
 	private ArrayList<ARRJavaPackage> packageElements;
 	private ArrayList<JavaClass> classElements;
-	private ArrayList<Dependency> dependencyList;
+	private ArrayList<CodeDependency> dependencyList;
 	
-	public DependencyMatrix( ArrayList<JavaClass> projectClasses, ArrayList<ARRJavaPackage> projectPackages, ArrayList<Dependency> dependencyCollection){
+	public CodeDependencyMatrix( ArrayList<JavaClass> projectClasses, ArrayList<ARRJavaPackage> projectPackages, ArrayList<CodeDependency> dependencyCollection){
 		matrix = new boolean[projectClasses.size()][projectPackages.size()];
 		this.classElements = projectClasses;
 		this.packageElements = projectPackages;
@@ -31,7 +31,7 @@ public class DependencyMatrix {
 		System.out.println("Número de classes: " + classElements.size() + "\nNúmero de Pacotes: "+ packageElements.size() +"\nNúmero de dependências: "+ dependencyList.size());
 		
 		System.out.println("\nDependências encontradas:\n(Classe, Pacote)");
-		for(Dependency d : dependencyList)
+		for(CodeDependency d : dependencyList)
 			System.out.println(d.getjClass().getName() + ", " + d.getjPackage().getName());
 		
 		System.out.println("\nClasses encontradas:");
@@ -72,10 +72,10 @@ public class DependencyMatrix {
 	public void setClassElements(ArrayList<JavaClass> classElements) {
 		this.classElements = classElements;
 	}
-	public ArrayList<Dependency> getDependencyList() {
+	public ArrayList<CodeDependency> getDependencyList() {
 		return dependencyList;
 	}
-	public void setDependencyList(ArrayList<Dependency> dependencyList) {
+	public void setDependencyList(ArrayList<CodeDependency> dependencyList) {
 		this.dependencyList = dependencyList;
 	}
 	

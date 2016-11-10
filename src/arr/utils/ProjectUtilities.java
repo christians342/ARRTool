@@ -30,8 +30,8 @@ import org.eclipse.ui.internal.Workbench;
 
 import arr.apriori.AprioriOutput;
 import arr.general.ARRJavaPackage;
-import arr.general.Dependency;
-import arr.general.DependencyMatrix;
+import arr.general.CodeDependency;
+import arr.general.CodeDependencyMatrix;
 import arr.ui.MessageSystem;
 import jdepend.framework.JDepend;
 import jdepend.framework.JavaClass;
@@ -40,10 +40,9 @@ import jdepend.framework.JavaPackage;
 
 @SuppressWarnings("restriction")
 public class ProjectUtilities {
-	private static DependencyMatrix dependencyMatrix;
+	private static CodeDependencyMatrix dependencyMatrix;
 	private static boolean dependencyMatrixStatus = false;
 	private static ArrayList<AprioriOutput> aOuts;
-	
 	
 	// Returns true if the dependency matrix was set at least one time while the project was running (aka the program was run at least one time)
 	public static boolean getDependencyMatrixStatus()
@@ -51,12 +50,12 @@ public class ProjectUtilities {
 		return dependencyMatrixStatus;
 	}
 	
-	public static DependencyMatrix getDependencyMatrix()
+	public static CodeDependencyMatrix getDependencyMatrix()
 	{
 		return dependencyMatrix;
 	}
 	
-	public static void setDependencyMatrix(DependencyMatrix d)
+	public static void setDependencyMatrix(CodeDependencyMatrix d)
 	{
 		dependencyMatrixStatus = true;
 		dependencyMatrix = d;
@@ -150,7 +149,7 @@ public class ProjectUtilities {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static DependencyMatrix getDependenciesFromProjects(ArrayList<IProject> projects)
+	public static CodeDependencyMatrix getDependenciesFromProjects(ArrayList<IProject> projects)
 	{
 		if(projects.isEmpty()){
 			System.out.println("ProjectNULL");
@@ -285,7 +284,7 @@ public class ProjectUtilities {
 
 			//Compare the imported packages name with the found packages name, if the name is the same we keep the data, otherwise it is a library input (.jar or system lib)
 			Iterator<ARRJavaPackage> i = importedPackages.iterator();
-			ArrayList<Dependency> dependencies = new ArrayList<Dependency>();
+			ArrayList<CodeDependency> dependencies = new ArrayList<CodeDependency>();
 			ArrayList<JavaClass> projectClasses = new ArrayList<JavaClass>();
 			ArrayList<ARRJavaPackage> projectPackages = new ArrayList<ARRJavaPackage>();
 			
@@ -333,14 +332,14 @@ public class ProjectUtilities {
 					            		if(importedPackageFromClass.getName().equals(mypackage2.getElementName()))
 					            		{
 					            			
-					            			dependencies.add(new Dependency(jClass,importedPackageFromClass,mypackage2.getJavaProject().getProject()));
+					            			dependencies.add(new CodeDependency(jClass,importedPackageFromClass,mypackage2.getJavaProject().getProject()));
 					            		}
 					            }
 					     }
 			        }
 			     }
 			}
-			DependencyMatrix fullDependencyMatrix = new DependencyMatrix(projectClasses, projectPackages, dependencies);
+			CodeDependencyMatrix fullDependencyMatrix = new CodeDependencyMatrix(projectClasses, projectPackages, dependencies);
 			fullDependencyMatrix.calculateMatrix();
 			
 			ProjectUtilities.setDependencyMatrix(fullDependencyMatrix);
@@ -354,7 +353,7 @@ public class ProjectUtilities {
 		return null;
 		
 	}
-	public static DependencyMatrix getDependenciesFromProject(IProject project)
+	public static CodeDependencyMatrix getDependenciesFromProject(IProject project)
 	{
 		ArrayList<IProject> projectsList = new ArrayList<IProject>();
 		projectsList.add(project);

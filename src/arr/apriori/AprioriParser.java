@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import arr.general.ARRJavaPackage;
-import arr.general.DependencyMatrix;
+import arr.general.CodeDependencyMatrix;
 import arr.utils.ProjectUtilities;
 
 public class AprioriParser {
 
 	File spmfFile;
-	DependencyMatrix matrix;
+	CodeDependencyMatrix matrix;
 	
 	public AprioriParser(File f)
 	{

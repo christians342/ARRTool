@@ -6,13 +6,27 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.emf.transaction.util.TransactionUtil;
+import org.eclipse.graphiti.examples.tutorial.Messages;
+import org.eclipse.graphiti.ui.editor.DiagramEditor;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -27,9 +41,12 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 
 import arr.apriori.Apriori;
@@ -53,7 +70,7 @@ public class ARRDataView extends ViewPart {
 	private Action actionExportDependencies;
 	private Action actionExportSPMF;
 	private Action actionOpenProperties;
-	 
+	private Action actionCreateDiagram;
 
 	/**
 	 * The constructor.
@@ -99,7 +116,7 @@ public class ARRDataView extends ViewPart {
 
 		TableViewerColumn targetPackageColumn = new TableViewerColumn (viewer, SWT.NONE);
 		targetPackageColumn.getColumn().setWidth(300);
-		targetPackageColumn.getColumn().setText("Target Package");
+		targetPackageColumn.getColumn().setText("Package");
 		targetPackageColumn.setLabelProvider(new ColumnLabelProvider() {
 			  @Override
 			  public String getText(Object element) {
@@ -166,6 +183,7 @@ public class ARRDataView extends ViewPart {
 		manager.add(new Separator());
 		manager.add(actionExportDependencies);
 		manager.add(actionExportSPMF);
+		manager.add(actionCreateDiagram);
 		manager.add(new Separator());
 		manager.add(actionOpenProperties);
 	}
@@ -176,6 +194,7 @@ public class ARRDataView extends ViewPart {
 		manager.add(new Separator());
 		manager.add(actionExportDependencies);
 		manager.add(actionExportSPMF);
+		manager.add(actionCreateDiagram);
 		manager.add(new Separator());
 		manager.add(actionOpenProperties);
 		// Other plug-ins can contribute there actions here
@@ -188,6 +207,7 @@ public class ARRDataView extends ViewPart {
 		manager.add(new Separator());
 		manager.add(actionExportDependencies);
 		manager.add(actionExportSPMF);
+		manager.add(actionCreateDiagram);
 		manager.add(new Separator());
 		manager.add(actionOpenProperties);
 	}
@@ -294,7 +314,67 @@ public class ARRDataView extends ViewPart {
 		actionExportSPMF.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
 				getImageDescriptor(ISharedImages.IMG_ETOOL_SAVEALL_EDIT));
 		
-	
+		actionCreateDiagram = new Action() {
+			public void run()
+			{		
+				// If ARR was not run yet
+				if(!ProjectUtilities.getDependencyMatrixStatus())
+				{
+					MessageSystem.runProjectFirst();
+					return;
+				}
+				
+				// Ask for the name of the new diagram
+				InputDialog dialog = new InputDialog(Display.getCurrent().getActiveShell(), "ARR Diagram", "Enter a name to the diagram that will be generated:", null, null);
+				if (dialog.open() != Dialog.OK) {
+					return;
+				}
+				String diagramName = dialog.getValue();
+
+				// Get the default resource set to hold the new resource
+				ResourceSet resourceSet = new ResourceSetImpl();
+				TransactionalEditingDomain editingDomain = TransactionUtil.getEditingDomain(resourceSet);
+				if (editingDomain == null) {
+					// Not yet existing, create one
+					editingDomain = TransactionalEditingDomain.Factory.INSTANCE.createEditingDomain(resourceSet);
+				}
+
+				// Create the data within a command and save (must not happen inside
+				// the command since finishing the command will trigger setting the 
+				// modification flag on the resource which will be used by the save
+				// operation to determine which resources need to be saved)
+				CreateDiagramCommand operation = new CreateDiagramCommand(editingDomain, diagramName);
+				editingDomain.getCommandStack().execute(operation);
+				try {
+					operation.getCreatedResource().save(null);
+				} catch (IOException e) {
+					IStatus status = new Status(IStatus.ERROR, "org.eclipse.graphiti.examples.tutorial", e.getMessage(), e); //$NON-NLS-1$
+					ErrorDialog.openError(Display.getCurrent().getActiveShell(), Messages.CreateDiagramWithAllClassesHandler_ErrorTitle, e.getMessage(), status);
+					return;
+				}
+
+				// Dispose the editing domain to eliminate memory leak
+				editingDomain.dispose();
+
+				// Open the editor
+				String platformString = operation.getCreatedResource().getURI().toPlatformString(true);
+				IFile file = ProjectUtilities.getCurrentProject().getParent().getFile(new Path(platformString));
+				IFileEditorInput input = new FileEditorInput(file);
+				try {
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, DiagramEditor.DIAGRAM_EDITOR_ID);
+				} catch (PartInitException e) {
+					return;
+				}
+
+				return;
+				
+			}
+		};
+		actionCreateDiagram.setText("Create Diagram with the selected values from the table");
+		actionCreateDiagram.setToolTipText("Create diagram with all values selected, if no value is selected it will use the full table as input.");
+		actionCreateDiagram.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
+				getImageDescriptor(ISharedImages.IMG_DEF_VIEW));
+		
 		actionOpenProperties = new Action() {
 			public void run()
 			{

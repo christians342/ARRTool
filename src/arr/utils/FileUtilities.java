@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import arr.apriori.AprioriOutput;
-import arr.general.DependencyMatrix;
+import arr.general.CodeDependencyMatrix;
 
 public class FileUtilities {
-	public static void createCSVFileForDependencies(DependencyMatrix dmatrix, File f) throws IOException
+	public static void createCSVFileForDependencies(CodeDependencyMatrix dmatrix, File f) throws IOException
 	{
 		if(f.exists())
 			Files.delete(f.toPath());
@@ -70,7 +70,7 @@ public class FileUtilities {
 		fw.close();
 	}
 	
-	public static File createSPMFInput(DependencyMatrix dmatrix, String fileName, String projectFolder) throws IOException
+	public static File createSPMFInput(CodeDependencyMatrix dmatrix, String fileName, String projectFolder) throws IOException
 	{
 		System.out.println("Creating SPMF file for project in folder " + projectFolder);
 		File f = new File(new File(projectFolder).getAbsolutePath() + File.separator + fileName + ".arr");

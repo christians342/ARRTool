@@ -9,7 +9,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import arr.general.DependencyMatrix;
+import arr.general.CodeDependencyMatrix;
 import arr.ui.ARRDataView;
 import arr.ui.MessageSystem;
 import arr.ui.OptionsView;
@@ -35,7 +35,7 @@ public class Apriori {
 		}
 		
 		File spmfData = null;
-		DependencyMatrix matrix = ProjectUtilities.getDependenciesFromProjects(projects);
+		CodeDependencyMatrix matrix = ProjectUtilities.getDependenciesFromProjects(projects);
 		ProjectUtilities.setDependencyMatrix(matrix);
 		if(matrix != null)
 		{

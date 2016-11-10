@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Button;
 public class OptionsView extends Shell {
 	private Text text;
 	public static int alg = 0;
-	public static float minsup = 0.04f;
+	public static float minsup = 0.000001f;
 	
 	/**
 	 * Launch the application.

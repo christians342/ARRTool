@@ -4,14 +4,14 @@ import org.eclipse.core.resources.IProject;
 
 import jdepend.framework.JavaClass;
 
-public class Dependency {
+public class CodeDependency {
 	
 	private JavaClass jClass;
 	private String targetClassPackageName;
 	private ARRJavaPackage jPackage;
 	private IProject iProject;
 	
-	public Dependency(JavaClass jClass, ARRJavaPackage jPackage, IProject project)
+	public CodeDependency(JavaClass jClass, ARRJavaPackage jPackage, IProject project)
 	{
 		this.jClass = jClass;
 		this.targetClassPackageName = jClass.getPackageName();

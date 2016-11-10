@@ -1,13 +1,15 @@
 package arr.general;
 
+
 import java.util.Collection;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 import jdepend.framework.JavaClass;
 import jdepend.framework.JavaPackage;
 
-public class ARRJavaPackage{
+public class ARRJavaPackage extends EObjectImpl implements ARRJavaPackageInterface{
 	
 	JavaPackage jPackage;
 	IProject packageProject;
@@ -47,4 +49,5 @@ public class ARRJavaPackage{
 	{
 		return this.jPackage;
 	}
+
 }
