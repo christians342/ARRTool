@@ -32,10 +32,14 @@ public class AddReferenceFeature extends AbstractAddFeature {
 		Connection connection = peCreateService.createFreeFormConnection(getDiagram());
 		connection.setStart(addConContext.getSourceAnchor());
 		connection.setEnd(addConContext.getTargetAnchor());
-
+		
+		ArchitecturalDependency dep = (ArchitecturalDependency) context.getNewObject();
+		
 		IGaService gaService = Graphiti.getGaService();
 		Polyline polyline = gaService.createPlainPolyline(connection);
 		polyline.setStyle(StyleUtil.getStyleForEClass(getDiagram()));
+		int lineWidht = (int) Math.ceil(dep.getSupport() * 10);
+		polyline.setLineWidth(lineWidht);
 
 		// create link and wire it
 		link(connection, addedDependency);
@@ -47,7 +51,7 @@ public class AddReferenceFeature extends AbstractAddFeature {
 		gaService.setLocation(text, 10, 0);
 
 		// set reference name in the text decorator
-		ArchitecturalDependency dep = (ArchitecturalDependency) context.getNewObject();
+		
 		text.setValue(String.valueOf(dep.getSupport()));
 
 		// if addedClass has no resource we add it to the resource of the diagram
@@ -59,7 +63,7 @@ public class AddReferenceFeature extends AbstractAddFeature {
 		// add static graphical decorators (composition and navigable)
 		ConnectionDecorator cd;
 		cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
-		createArrow(cd);
+		createArrow(cd, lineWidht);
 		return connection;
 	}
 
@@ -72,10 +76,11 @@ public class AddReferenceFeature extends AbstractAddFeature {
 		return false;
 	}
 
-	private Polyline createArrow(GraphicsAlgorithmContainer gaContainer) {
+	private Polyline createArrow(GraphicsAlgorithmContainer gaContainer, int widht) {
 		Polyline polyline = Graphiti.getGaCreateService().createPlainPolyline(gaContainer,
 				new int[] { -15, 10, 0, 0, -15, -10 });
 		polyline.setStyle(StyleUtil.getStyleForEClass(getDiagram()));
+		polyline.setLineWidth(widht);
 		return polyline;
 	}
 }

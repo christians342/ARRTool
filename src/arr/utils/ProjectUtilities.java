@@ -182,14 +182,10 @@ public class ProjectUtilities {
 			classFolders.add(new File(path));
 		}
 		
-		for(File f : classFolders)
-			System.out.println("Folder aaa " + f.getAbsolutePath());
-		
-		
 		Collection<File> srcFilesFromProjects = new ArrayList<File>();
 		for(File folder : srcFolders)
 		{
-			System.out.println("Source Folder? " + folder.getAbsolutePath() );
+			System.out.println("Source Folder " + folder.getAbsolutePath() );
 			srcFilesFromProjects.addAll(FileUtils.listFilesAndDirs(folder, TrueFileFilter.TRUE, TrueFileFilter.INSTANCE));
 		}
 		Collection<File> classFilesFromProjects = new ArrayList<File>();
@@ -206,13 +202,13 @@ public class ProjectUtilities {
 		
 		
 		// JDepend library call code
-		System.out.println("\nPaths para o jDepend analizar:");
+		//System.out.println("\nPaths para o jDepend analizar:");
 		JDepend jdepend = new JDepend();
 		try {
 			for(File f : classesFolders)
 			{
 				String fp = f.getAbsolutePath().replace('\\', '/');
-				System.out.println(fp);
+				//System.out.println(fp);
 				jdepend.addDirectory(fp);
 			}
 		} catch (IOException e) {
@@ -224,12 +220,15 @@ public class ProjectUtilities {
 		ArrayList<JavaPackage> importedJPackages = new ArrayList<JavaPackage>(jdepend.analyze());
 		
 		
+		
 		ArrayList<ARRJavaPackage> importedPackages = new ArrayList<ARRJavaPackage>();
 		for(int i = 0; i < importedJPackages.size(); i++)
 		{
+			System.out.println("Pacote do JDepend: " + importedJPackages.get(i).getName());
 			importedPackages.add(new ARRJavaPackage(importedJPackages.get(i)));
 		}
 		
+		fixHigherPackages(importedPackages);
 		
 		//Uses the JavaCore.create method to get all the packages within the selected projects
 		ArrayList<IJavaProject> jProjects = new ArrayList<IJavaProject>();
@@ -274,12 +273,6 @@ public class ProjectUtilities {
 						
 					}
 				}
-			}
-
-			System.out.println("\nPacotes filtrados:");
-			for(IPackageFragment pf : filteredClasspathPackages)
-			{
-				System.out.println(pf.getElementName());
 			}
 
 			//Compare the imported packages name with the found packages name, if the name is the same we keep the data, otherwise it is a library input (.jar or system lib)
@@ -331,7 +324,6 @@ public class ProjectUtilities {
 					            	for (IPackageFragment mypackage2 : filteredClasspathPackages)
 					            		if(importedPackageFromClass.getName().equals(mypackage2.getElementName()))
 					            		{
-					            			
 					            			dependencies.add(new CodeDependency(jClass,importedPackageFromClass,mypackage2.getJavaProject().getProject()));
 					            		}
 					            }
@@ -353,6 +345,98 @@ public class ProjectUtilities {
 		return null;
 		
 	}
+	private static void fixHigherPackages(ArrayList<ARRJavaPackage> importedJPackages) {
+		
+		boolean mustRunAgain = false;
+		//Para cada pacote existente dentro de importedJPackages
+		for(int i = 0; i < importedJPackages.size(); i++)
+		{
+			// Se existe um pai
+			if(getUpperPackageName(importedJPackages.get(i)) != null)
+			{
+				boolean existsInList = false;
+				//Verificar se já tenho o pacote "pai" dentro da lista
+				for(int j = 0; j < importedJPackages.size(); j++)
+				{
+					if(importedJPackages.get(j).getName().equals(getUpperPackageName(importedJPackages.get(i))))
+						existsInList = true;
+				}
+				if(!existsInList)
+				{
+					//Caso não tenha, cria ele e passa por todos os pacotes da lista e 
+					ARRJavaPackage upperPackage = new ARRJavaPackage(getUpperPackageName(importedJPackages.get(i)));
+					for(int j = 0; j < importedJPackages.size(); j++)
+					{
+						
+						//Adiciona, para todos os que importam os filhos dele, ele mesmo como import;
+						for (int k = 0; k < importedJPackages.get(j).getClasses().size(); k ++) 
+					    {
+							boolean alreadyAdd = false;
+							JavaClass jClass = (JavaClass) importedJPackages.get(j).getClasses().toArray()[k];
+				            
+							for (int l = 0; l < jClass.getImportedPackages().size(); l++) 
+				            {
+								
+				            	JavaPackage importedPackageFromClass = (JavaPackage) jClass.getImportedPackages().toArray()[l];
+								if(importedPackageFromClass.getName().contains(upperPackage.getName()) && !alreadyAdd)
+								{
+									alreadyAdd = true;
+									jClass.addImportedPackage(upperPackage.getJavaPackage());
+								}
+							}
+					     }
+						
+					}
+					
+					for(int j = 0; j < importedJPackages.size(); j++)
+					{
+						//vê se são parentes
+						if(importedJPackages.get(j).getName().contains(upperPackage.getName()))
+						{
+							System.out.println("Pacote: " + importedJPackages.get(j).getName() + " contém: " + upperPackage.getName());
+							//Adiciona todos as classes do pacote que contém o nome dele, caso não existam ainda;
+							
+							for(int k = 0; k < importedJPackages.get(j).getClasses().size(); k++)
+							{
+								if(!upperPackage.getClasses().contains(importedJPackages.get(j).getClasses().toArray()[k]))
+									upperPackage.getJavaPackage().addClass((JavaClass) importedJPackages.get(j).getClasses().toArray()[k]);
+							}
+
+						}
+					}
+					
+					System.out.println("Adicionando pacote extra de nome: " + upperPackage.getName());
+					System.out.println("Com " + upperPackage.getClasses().size() + " classes;");
+					upperPackage.setSpecial(true);
+					importedJPackages.add(upperPackage);
+					mustRunAgain = true;
+				}
+			}
+		}
+		
+	}
+	
+	private static String getUpperPackageName(ARRJavaPackage p)
+	{
+		boolean isEmpty = true;
+		
+		String[] nameArray = p.getName().split("\\.");
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		if(nameArray.length != 0)
+			for(int i = 0; i < (nameArray.length - 1); i++)
+			{
+				isEmpty = false;
+				stringBuilder.append(nameArray[i]);
+				if(i != nameArray.length - 2)
+					stringBuilder.append(".");
+			}
+		
+		if(!isEmpty)
+			return new String(stringBuilder.toString());
+		return null;
+	}
+	
 	public static CodeDependencyMatrix getDependenciesFromProject(IProject project)
 	{
 		ArrayList<IProject> projectsList = new ArrayList<IProject>();

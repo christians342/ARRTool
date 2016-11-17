@@ -53,7 +53,7 @@ public class CreateDependencyFeature extends AbstractCreateConnectionFeature  {
 				source instanceof ARRJavaPackage && 
 				target instanceof ARRJavaPackage){
 			// create new business object
-			ArchitecturalDependency dep = new ArchitecturalDependency((ARRJavaPackage)source, (ARRJavaPackage)target, 0.5f);
+			ArchitecturalDependency dep = new ArchitecturalDependency((ARRJavaPackage)source, (ARRJavaPackage)target, 0.5f,0);
 
 			// add connection for business object
 			AddConnectionContext addContext = new AddConnectionContext(context.getSourceAnchor(), context.getTargetAnchor());

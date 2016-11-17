@@ -13,6 +13,8 @@ public class ARRJavaPackage extends EObjectImpl implements ARRJavaPackageInterfa
 	
 	JavaPackage jPackage;
 	IProject packageProject;
+	int	numberOfClasses;
+	boolean specialPackage = false;
 	
 	public IProject getPackageProject() {
 		return packageProject;
@@ -49,5 +51,25 @@ public class ARRJavaPackage extends EObjectImpl implements ARRJavaPackageInterfa
 	{
 		return this.jPackage;
 	}
+	
+	public void setNumberOfClasses(int n)
+	{
+		this.numberOfClasses = n;
+	}
 
+	public int getNumberOfClasses()
+	{
+		return this.numberOfClasses;
+	}
+	
+	public void setSpecial(boolean s)
+	{
+		this.specialPackage = s;
+	}
+	
+	public boolean getSpecial()
+	{
+		return this.specialPackage;
+	}
+	
 }

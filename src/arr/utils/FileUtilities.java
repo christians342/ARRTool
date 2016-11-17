@@ -96,7 +96,7 @@ public class FileUtilities {
 				{
 					if (dmatrix.getPackageElements().get(j).getClasses().contains(dmatrix.getClassElements().get(i)))
 					{
-						fw.write(Integer.toString(j + 10000));
+						fw.write(Integer.toString(j + 10000) + " ");
 					}
 				}
 				if(dmatrix.getClassElements().size() != (i+1))

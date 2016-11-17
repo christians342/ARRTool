@@ -63,6 +63,7 @@ public class CreateDiagramCommand extends RecordingCommand {
 			}
 		}
 
+		int colorID = 0;
 		//Para todas as saídas do apriori
 		for(AprioriOutput aOut : aOuts)
 		{
@@ -84,13 +85,14 @@ public class CreateDiagramCommand extends RecordingCommand {
 				//se a regra já existe e está lá, atualiza o valor de suporte (TODO: FAZER VÁRIAS REGRAS IGUAIS?)
 				if(alreadyHaveSource)
 				{
-					if(ref.getSupport() < aOut.getSuport())
+					if(ref.getSupport() <= aOut.getSuport())
 						ref.setSupport(aOut.getSuport());
 				}
 				//caso contrário, cria regra nas archdeps
 				else
 				{
-					ArchitecturalDependency ad = new ArchitecturalDependency(aOut.getTargetPackage(), innerPackage,aOut.getSuport());
+					ArchitecturalDependency ad = new ArchitecturalDependency(aOut.getTargetPackage(), innerPackage,aOut.getSuport(), colorID);
+					colorID++;
 					archDeps.add(ad);
 				}
 				alreadyHaveSource = false;	

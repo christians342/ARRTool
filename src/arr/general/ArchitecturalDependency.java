@@ -6,12 +6,14 @@ public class ArchitecturalDependency extends EObjectImpl implements Architectura
 	private ARRJavaPackage source;
 	private ARRJavaPackage target;
 	double support = 0.0;
+	int colorIdentifier = 0;
 	
-	public ArchitecturalDependency(ARRJavaPackage src, ARRJavaPackage target, double sup)
+	public ArchitecturalDependency(ARRJavaPackage src, ARRJavaPackage target, double sup, int identifier)
 	{
 		this.source = src;
 		this.target = target;
 		this.support = sup;
+		this.colorIdentifier = identifier;
 	}
 	
 	public ARRJavaPackage getSource()

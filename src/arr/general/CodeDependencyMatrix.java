@@ -30,18 +30,18 @@ public class CodeDependencyMatrix {
 		System.out.println("\nCalculando Matriz de dependências para o SPMF:");
 		System.out.println("Número de classes: " + classElements.size() + "\nNúmero de Pacotes: "+ packageElements.size() +"\nNúmero de dependências: "+ dependencyList.size());
 		
-		System.out.println("\nDependências encontradas:\n(Classe, Pacote)");
-		for(CodeDependency d : dependencyList)
-			System.out.println(d.getjClass().getName() + ", " + d.getjPackage().getName());
+		//System.out.println("\nDependências encontradas:\n(Classe, Pacote)");
+		//for(CodeDependency d : dependencyList)
+		//	System.out.println(d.getjClass().getName() + ", " + d.getjPackage().getName());
 		
-		System.out.println("\nClasses encontradas:");
-		for(JavaClass jClass : classElements)
-			System.out.println(jClass.getName());
+		//System.out.println("\nClasses encontradas:");
+		//for(JavaClass jClass : classElements)
+		//	System.out.println(jClass.getName());
 		
 
-		System.out.println("\nPacotes encontrados:");
-		for(ARRJavaPackage jPackage : packageElements)
-			System.out.println(jPackage.getName());
+		//System.out.println("\nPacotes encontrados:");
+		//for(ARRJavaPackage jPackage : packageElements)
+		//	System.out.println(jPackage.getName());
 		
 		// Need to compare with == and not with .equals because JDepend framework overwrites the .compare method on jClass and JavaPackage.
 		for(int i = 0; i < classElements.size(); i++)
@@ -49,7 +49,7 @@ public class CodeDependencyMatrix {
 				for(int z = 0; z < dependencyList.size(); z++)
 					if(classElements.get(i) == (dependencyList.get(z).getjClass()) && packageElements.get(j) == (dependencyList.get(z).getjPackage()))
 						matrix[i][j] = true;
-		printMatrix();
+		//printMatrix();
 		calculateNumberOfTransactions();
 		
 		
