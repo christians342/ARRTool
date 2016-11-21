@@ -5,6 +5,7 @@ import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
+import arr.general.impl.ARRJavaPackageImpl;
 import arr.general.ARRJavaPackage;
 
 public class CreateJavaPackageFeature extends AbstractCreateFeature {
@@ -19,13 +20,24 @@ public class CreateJavaPackageFeature extends AbstractCreateFeature {
 
 	public Object[] create(ICreateContext context) {
 		// create JavaPackage
-		ARRJavaPackage newPackage = new ARRJavaPackage("Test package");
+		ARRJavaPackage newPackage = new ARRJavaPackageImpl("Test package");
+		
 		// Add model element to resource.
-		// We add the model element to the resource of the diagram for
-		// simplicity's sake. Normally, a customer would use its own
-		// model persistence layer for storing the business model separately.
 		getDiagram().eResource().getContents().add(newPackage);
-
+		
+		/*
+		if (newPackage.eResource() == null) {
+				try {
+				FileUtilities.saveToModelFile(newPackage, getDiagram());
+			} catch (CoreException e) {
+				System.out.println("deu estranho");
+				e.printStackTrace();
+			} catch (IOException e) {
+				System.out.println("deu estranho 2");
+				e.printStackTrace();
+			}
+		}
+		 */
 		//		Use the following instead of the above line to store the model
 		//		data in a seperate file parallel to the diagram file
 		//		try {

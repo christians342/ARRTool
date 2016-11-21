@@ -8,7 +8,7 @@ import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
 
-import arr.general.ARRJavaPackageInterface;
+import arr.general.ARRJavaPackage;
 
 public class ToolBehaviorProvider extends DefaultToolBehaviorProvider {
     
@@ -20,7 +20,7 @@ public class ToolBehaviorProvider extends DefaultToolBehaviorProvider {
 	public GraphicsAlgorithm[] getClickArea(PictogramElement pe) {
 	    IFeatureProvider featureProvider = getFeatureProvider();
 	    Object bo = featureProvider.getBusinessObjectForPictogramElement(pe);
-	    if (bo instanceof ARRJavaPackageInterface) {
+	    if (bo instanceof ARRJavaPackage) {
 	        GraphicsAlgorithm invisible = pe.getGraphicsAlgorithm();
 	        GraphicsAlgorithm rectangle =
 	            invisible.getGraphicsAlgorithmChildren().get(0);

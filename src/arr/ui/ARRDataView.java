@@ -3,6 +3,8 @@ package arr.ui;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -51,9 +53,8 @@ import org.eclipse.ui.part.ViewPart;
 
 import arr.apriori.Apriori;
 import arr.apriori.AprioriOutput;
-import arr.general.ARRJavaPackage;
-import arr.utils.FileUtilities;
-import arr.utils.ProjectUtilities;
+import arr.util.FileUtilities;
+import arr.util.ProjectUtilities;
 
 
 public class ARRDataView extends ViewPart {
@@ -72,6 +73,8 @@ public class ARRDataView extends ViewPart {
 	private Action actionOpenProperties;
 	private Action actionCreateDiagram;
 
+	static DecimalFormat df = new DecimalFormat("#.###");
+	
 	/**
 	 * The constructor.
 	 */
@@ -113,15 +116,23 @@ public class ARRDataView extends ViewPart {
 	
 	private void createColumns(Composite parent)
 	{
-
+		df.setRoundingMode(RoundingMode.CEILING);
+		
 		TableViewerColumn targetPackageColumn = new TableViewerColumn (viewer, SWT.NONE);
 		targetPackageColumn.getColumn().setWidth(300);
-		targetPackageColumn.getColumn().setText("Package");
+		targetPackageColumn.getColumn().setText("Base Packages");
 		targetPackageColumn.setLabelProvider(new ColumnLabelProvider() {
 			  @Override
 			  public String getText(Object element) {
 			    AprioriOutput p = (AprioriOutput) element;
-			    return p.getTargetPackage().getName();
+			    String output = "";
+			    for(int i = 0; i < p.getBasePackages().size(); i++)
+			    {
+			    	output = output + p.getBasePackages().get(i).getName();
+			    	if(i != (p.getBasePackages().size() - 1))
+			    		output+= ", ";
+			    }
+			    return output;
 			  }
 			});
 		TableViewerColumn usedPackagesColumn = new TableViewerColumn (viewer, SWT.NONE);
@@ -132,9 +143,11 @@ public class ARRDataView extends ViewPart {
 			  public String getText(Object element) {
 			    AprioriOutput e = (AprioriOutput) element;
 			    String output = "";
-			    for(ARRJavaPackage a : e.getjPackages())
+			    for(int i = 0; i < e.getUsedPackages().size(); i++)
 			    {
-			    	output = output + a.getName() + ", " ;
+			    	output = output + e.getUsedPackages().get(i).getName();
+			    	if(i != (e.getUsedPackages().size() - 1))
+			    		output+= ", ";
 			    }
 			    return output;
 			  }
@@ -147,7 +160,7 @@ public class ARRDataView extends ViewPart {
 			  @Override
 			  public String getText(Object element) {
 			    AprioriOutput e = (AprioriOutput) element;
-			    return String.valueOf(e.getSuport());
+			    return df.format(e.getSuport());
 			  }
 			});
 	}
@@ -345,10 +358,11 @@ public class ARRDataView extends ViewPart {
 				// operation to determine which resources need to be saved)
 				CreateDiagramCommand operation = new CreateDiagramCommand(editingDomain, diagramName);
 				editingDomain.getCommandStack().execute(operation);
+				
 				try {
 					operation.getCreatedResource().save(null);
 				} catch (IOException e) {
-					IStatus status = new Status(IStatus.ERROR, "org.eclipse.graphiti.examples.tutorial", e.getMessage(), e); //$NON-NLS-1$
+					IStatus status = new Status(IStatus.ERROR, "org.eclipse.graphiti", e.getMessage(), e); //$NON-NLS-1$
 					ErrorDialog.openError(Display.getCurrent().getActiveShell(), Messages.CreateDiagramWithAllClassesHandler_ErrorTitle, e.getMessage(), status);
 					return;
 				}

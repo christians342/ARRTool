@@ -13,8 +13,8 @@ import arr.general.CodeDependencyMatrix;
 import arr.ui.ARRDataView;
 import arr.ui.MessageSystem;
 import arr.ui.OptionsView;
-import arr.utils.FileUtilities;
-import arr.utils.ProjectUtilities;
+import arr.util.FileUtilities;
+import arr.util.ProjectUtilities;
 import ca.pfv.spmf.algorithms.frequentpatterns.apriori.AlgoApriori;
 
 public class Apriori {
@@ -54,7 +54,7 @@ public class Apriori {
 		}				
 		if(spmfData != null)
 		{
-			double minsup = OptionsView.minsup; // gets the minsup from the optionsview (default is 0.4 -> 2 transactions)
+			double minsup = OptionsView.minsup;
 			// Applying the Apriori algorithm
 			AlgoApriori apriori = new AlgoApriori();
 			try {

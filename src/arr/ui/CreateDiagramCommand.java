@@ -21,17 +21,17 @@ import org.eclipse.graphiti.ui.services.GraphitiUi;
 
 import arr.apriori.AprioriOutput;
 import arr.general.ARRJavaPackage;
-import arr.general.ARRJavaPackageInterface;
 import arr.general.ArchitecturalDependency;
-//import arr.general.ArchitecturalDependency;
-import arr.utils.ProjectUtilities;
+import arr.general.impl.ArchitecturalDependencyImpl;
+import arr.util.ColorGenerator;
+import arr.util.ProjectUtilities;
 
 public class CreateDiagramCommand extends RecordingCommand {
 
 	private TransactionalEditingDomain editingDomain;
 	private String diagramName;
 	private Resource createdResource;
-	public static ArrayList<ARRJavaPackageInterface> allPackages;
+	public static ArrayList<ARRJavaPackage> allPackages;
 	
 	public CreateDiagramCommand(TransactionalEditingDomain editingDomain, String diagramName) {
 		super(editingDomain);
@@ -46,59 +46,46 @@ public class CreateDiagramCommand extends RecordingCommand {
 		ArrayList<ArchitecturalDependency> archDeps = new ArrayList<ArchitecturalDependency>();
 		
 		// Get all JavaPackages that will be used
-		allPackages = new ArrayList<ARRJavaPackageInterface>();
+		allPackages = new ArrayList<ARRJavaPackage>();
 		
 		for(AprioriOutput aOut : aOuts)
 		{
-			for(ARRJavaPackage a : aOut.getjPackages())
+			for(ARRJavaPackage a : aOut.getUsedPackages())
 			{
 				if(!allPackages.contains(a))
 				{
 					allPackages.add(a);
 				}
 			}
-			if(!allPackages.contains(aOut.getTargetPackage()))
+			for(int i = 0; i < aOut.getBasePackages().size(); i++)
 			{
-				allPackages.add(aOut.getTargetPackage());
+				if(!allPackages.contains(aOut.getBasePackages().get(i)))
+				{
+					allPackages.add(aOut.getBasePackages().get(i));
+				}
 			}
 		}
 
-		int colorID = 0;
+		int ID = 0;
 		//Para todas as saídas do apriori
 		for(AprioriOutput aOut : aOuts)
 		{
-			boolean alreadyHaveSource = false;
-			ArchitecturalDependency ref = null;
-			//Para todas as archdeps que eu já salvei
-			for(ArchitecturalDependency archDep : archDeps)
-			{
-				//Se eu tenho alguma source que a archdep é esse target package do apriori
-				if(archDep.getTarget() == aOut.getTargetPackage())
-				{
-					alreadyHaveSource = true;
-					ref = archDep;
-				}
-			}
 			//para todos os jpackages dessa regra gerada, se ela existe dentro do meu conjunto de archdeps
-			for(ARRJavaPackage innerPackage : aOut.getjPackages())
+			for(ARRJavaPackage innerPackage : aOut.getUsedPackages())
 			{
-				//se a regra já existe e está lá, atualiza o valor de suporte (TODO: FAZER VÁRIAS REGRAS IGUAIS?)
-				if(alreadyHaveSource)
+				// cria regra nas archdeps
+				for(int i = 0; i < aOut.getBasePackages().size(); i++)
 				{
-					if(ref.getSupport() <= aOut.getSuport())
-						ref.setSupport(aOut.getSuport());
-				}
-				//caso contrário, cria regra nas archdeps
-				else
-				{
-					ArchitecturalDependency ad = new ArchitecturalDependency(aOut.getTargetPackage(), innerPackage,aOut.getSuport(), colorID);
-					colorID++;
+					ArchitecturalDependency ad = new ArchitecturalDependencyImpl(aOut.getBasePackages().get(i), innerPackage,aOut.getSuport(), ID);
 					archDeps.add(ad);
 				}
-				alreadyHaveSource = false;	
+				ID++;
 			}
 			
 		}
+		
+
+		ColorGenerator.generateRandomColors(ID);
 		
 		//Agora que tenho todas as dependências preciso só criar eles no diagrama.
 		
@@ -127,18 +114,16 @@ public class CreateDiagramCommand extends RecordingCommand {
 			addContext.setTargetContainer(diagram);
 			addContext.setX(x);
 			addContext.setY(y);
-			addContext.setHeight(100);
-			addContext.setWidth(300);
-			x = x + 25;
-			y = y + 25;
+			x = x + 100;
+			y = y + 100;
 			IAddFeature addFeature = featureProvider.getAddFeature(addContext);
 			if (addFeature.canAdd(addContext)) {
 				peList.add(addFeature.add(addContext));
 			}
+			
 		}
 		
 		//add all references between them
-
 		for(ArchitecturalDependency archDep : archDeps)
 		{
 			

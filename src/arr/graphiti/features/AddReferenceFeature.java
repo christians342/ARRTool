@@ -1,5 +1,9 @@
 package arr.graphiti.features;
 
+import java.awt.Color;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+
 import org.eclipse.graphiti.examples.tutorial.StyleUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
@@ -18,9 +22,12 @@ import org.eclipse.graphiti.services.IPeCreateService;
 import arr.general.ArchitecturalDependency;
 
 public class AddReferenceFeature extends AbstractAddFeature {
-
+	
+	static DecimalFormat df = new DecimalFormat("#.###");
+	
 	public AddReferenceFeature(IFeatureProvider fp) {
 		super(fp);
+		df.setRoundingMode(RoundingMode.CEILING);
 	}
 
 	public PictogramElement add(IAddContext context) {
@@ -40,6 +47,10 @@ public class AddReferenceFeature extends AbstractAddFeature {
 		polyline.setStyle(StyleUtil.getStyleForEClass(getDiagram()));
 		int lineWidht = (int) Math.ceil(dep.getSupport() * 10);
 		polyline.setLineWidth(lineWidht);
+		
+		Color c = arr.util.ColorGenerator.getColor(addedDependency.getId());
+		
+		polyline.setForeground(gaService.manageColor(getDiagram(), c.getRed(), c.getGreen(), c.getBlue()));
 
 		// create link and wire it
 		link(connection, addedDependency);
@@ -52,10 +63,9 @@ public class AddReferenceFeature extends AbstractAddFeature {
 
 		// set reference name in the text decorator
 		
-		text.setValue(String.valueOf(dep.getSupport()));
+		text.setValue(df.format(dep.getSupport()));
 
 		// if addedClass has no resource we add it to the resource of the diagram
-			// in a real scenario the business model would have its own resource
 			if (addedDependency.eResource() == null) {
 				getDiagram().eResource().getContents().add(addedDependency);
 			}
@@ -63,7 +73,7 @@ public class AddReferenceFeature extends AbstractAddFeature {
 		// add static graphical decorators (composition and navigable)
 		ConnectionDecorator cd;
 		cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
-		createArrow(cd, lineWidht);
+		createArrow(cd, lineWidht, c);
 		return connection;
 	}
 
@@ -76,11 +86,12 @@ public class AddReferenceFeature extends AbstractAddFeature {
 		return false;
 	}
 
-	private Polyline createArrow(GraphicsAlgorithmContainer gaContainer, int widht) {
+	private Polyline createArrow(GraphicsAlgorithmContainer gaContainer, int widht, Color c) {
 		Polyline polyline = Graphiti.getGaCreateService().createPlainPolyline(gaContainer,
 				new int[] { -15, 10, 0, 0, -15, -10 });
 		polyline.setStyle(StyleUtil.getStyleForEClass(getDiagram()));
 		polyline.setLineWidth(widht);
+		polyline.setForeground(((IGaService) Graphiti.getGaCreateService()).manageColor(getDiagram(), c.getRed(), c.getGreen(), c.getBlue()));
 		return polyline;
 	}
 }

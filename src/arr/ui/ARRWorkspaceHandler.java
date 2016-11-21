@@ -9,7 +9,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 
 import arr.apriori.Apriori;
-import arr.utils.ProjectUtilities;
+import arr.util.ProjectUtilities;
 
 
 public class ARRWorkspaceHandler extends AbstractHandler{

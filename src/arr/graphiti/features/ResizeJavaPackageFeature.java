@@ -5,7 +5,7 @@ import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.impl.DefaultResizeShapeFeature;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 
-import arr.general.ARRJavaPackageInterface;
+import arr.general.ARRJavaPackage;
 
 public class ResizeJavaPackageFeature extends DefaultResizeShapeFeature {
 
@@ -22,8 +22,8 @@ public class ResizeJavaPackageFeature extends DefaultResizeShapeFeature {
             // don't allow resize if the package name has the length of less than or equal to 1
             Shape shape = context.getShape();
             Object bo = getBusinessObjectForPictogramElement(shape);
-            if (bo instanceof ARRJavaPackageInterface) {
-            	ARRJavaPackageInterface p = (ARRJavaPackageInterface) bo;
+            if (bo instanceof ARRJavaPackage) {
+            	ARRJavaPackage p = (ARRJavaPackage) bo;
                 if (p.getName() != null && p.getName().length() <= 1) {
                     canResize = false;
                 }

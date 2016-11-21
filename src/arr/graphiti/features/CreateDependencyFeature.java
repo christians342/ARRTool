@@ -7,8 +7,9 @@ import org.eclipse.graphiti.features.impl.AbstractCreateConnectionFeature;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
-import arr.general.ARRJavaPackage;
 import arr.general.ArchitecturalDependency;
+import arr.general.impl.ArchitecturalDependencyImpl;
+import arr.general.ARRJavaPackage;
 
 public class CreateDependencyFeature extends AbstractCreateConnectionFeature  {
 	public CreateDependencyFeature(IFeatureProvider fp) {
@@ -53,7 +54,7 @@ public class CreateDependencyFeature extends AbstractCreateConnectionFeature  {
 				source instanceof ARRJavaPackage && 
 				target instanceof ARRJavaPackage){
 			// create new business object
-			ArchitecturalDependency dep = new ArchitecturalDependency((ARRJavaPackage)source, (ARRJavaPackage)target, 0.5f,0);
+			ArchitecturalDependency dep = new ArchitecturalDependencyImpl((ARRJavaPackage)source, (ARRJavaPackage)target, 0.5f,0);
 
 			// add connection for business object
 			AddConnectionContext addContext = new AddConnectionContext(context.getSourceAnchor(), context.getTargetAnchor());

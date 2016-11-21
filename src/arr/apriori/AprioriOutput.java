@@ -5,23 +5,23 @@ import java.util.ArrayList;
 import arr.general.ARRJavaPackage;
 
 public class AprioriOutput {
-	ARRJavaPackage targetPackage;
-	ArrayList<ARRJavaPackage> jPackages;
+	ArrayList<ARRJavaPackage> basePackages;
+	ArrayList<ARRJavaPackage> usedPackages;
 	double suport = 0.0;
-	
-	public AprioriOutput(ARRJavaPackage targetJPackage, ArrayList<ARRJavaPackage> jPackages, double suport)
+
+	public AprioriOutput(ArrayList<ARRJavaPackage> basePackages, ArrayList<ARRJavaPackage> jPackages, double suport)
 	{
-		this.targetPackage = targetJPackage;
-		this.jPackages = jPackages;
+		this.basePackages = basePackages;
+		this.usedPackages = jPackages;
 		this.suport = suport;
 	}
 
-	public ARRJavaPackage getTargetPackage() {
-		return targetPackage;
+	public ArrayList<ARRJavaPackage> getBasePackages() {
+		return basePackages;
 	}
 
-	public ArrayList<ARRJavaPackage> getjPackages() {
-		return jPackages;
+	public ArrayList<ARRJavaPackage> getUsedPackages() {
+		return usedPackages;
 	}
 
 	public Double getSuport() {

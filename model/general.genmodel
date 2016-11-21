@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/org.arr/src" modelPluginID="org.arr" modelName="General"
+    rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="8.0" copyrightFields="false" operationReflection="true" importOrganizing="true">
+  <foreignModel>arr.general.ecore</foreignModel>
+  <genPackages prefix="General" disposableProviderFactory="true" ecorePackage="arr.general.ecore#/">
+    <genClasses ecoreClass="arr.general.ecore#//ArchitecturalDependency">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute arr.general.ecore#//ArchitecturalDependency/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute arr.general.ecore#//ArchitecturalDependency/support"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference arr.general.ecore#//ArchitecturalDependency/source"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference arr.general.ecore#//ArchitecturalDependency/target"/>
+    </genClasses>
+    <genClasses ecoreClass="arr.general.ecore#//ARRJavaPackage">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute arr.general.ecore#//ARRJavaPackage/specialPackage"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute arr.general.ecore#//ARRJavaPackage/JavaPackage"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute arr.general.ecore#//ARRJavaPackage/packageProject"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

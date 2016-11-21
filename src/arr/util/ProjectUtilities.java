@@ -1,4 +1,4 @@
-package arr.utils;
+package arr.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +29,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.Workbench;
 
 import arr.apriori.AprioriOutput;
+import arr.general.impl.ARRJavaPackageImpl;
 import arr.general.ARRJavaPackage;
 import arr.general.CodeDependency;
 import arr.general.CodeDependencyMatrix;
@@ -219,13 +220,11 @@ public class ProjectUtilities {
 		//Using jDepend to analyze the selected files
 		ArrayList<JavaPackage> importedJPackages = new ArrayList<JavaPackage>(jdepend.analyze());
 		
-		
-		
 		ArrayList<ARRJavaPackage> importedPackages = new ArrayList<ARRJavaPackage>();
 		for(int i = 0; i < importedJPackages.size(); i++)
 		{
 			System.out.println("Pacote do JDepend: " + importedJPackages.get(i).getName());
-			importedPackages.add(new ARRJavaPackage(importedJPackages.get(i)));
+			importedPackages.add(new ARRJavaPackageImpl(importedJPackages.get(i)));
 		}
 		
 		fixHigherPackages(importedPackages);
@@ -284,12 +283,12 @@ public class ProjectUtilities {
 			// Stores all the project(s) packages first, then run for the classes within them
 			while (i.hasNext()) 
 			{
-				 ARRJavaPackage jPackage = (ARRJavaPackage) i.next();
+				ARRJavaPackage jPackage = (ARRJavaPackage) i.next();
 				 for (IPackageFragment mypackage : filteredClasspathPackages) 
 				 {
 					if(jPackage.getName().equals(mypackage.getElementName()))
 				    {
-						 jPackage.setPackageProject(mypackage.getJavaProject().getProject());
+						 jPackage.setPackageProjectName(mypackage.getJavaProject().getProject().getName());
 						 System.out.println("Found similar ->\njPackage name: " + jPackage.getName() + " \nfilteredClasspathPackages: " + mypackage.getElementName());
 						 projectPackages.add(jPackage);
 				    }
@@ -300,17 +299,21 @@ public class ProjectUtilities {
 			
 			while (i.hasNext()) 
 			{
-				 ARRJavaPackage jPackage = (ARRJavaPackage) i.next();
+				ARRJavaPackage jPackage = (ARRJavaPackage) i.next();
 				 for (IPackageFragment mypackage : filteredClasspathPackages) 
 				 {
 					if(jPackage.getName().equals(mypackage.getElementName()))
 				    {
-						 Collection<?> classes = jPackage.getClasses();
+						 
+						 Collection<?> classes = jPackage.getJavaPackage().getClasses();
 					     for (Iterator<?> j = classes.iterator(); j.hasNext();) 
 					     {
 					            JavaClass jClass = (JavaClass)j.next();
-					            projectClasses.add(jClass);
+
+					            if(!projectClasses.contains(jClass))
+					            	projectClasses.add(jClass);
 					            ArrayList<JavaPackage> classJImports = new ArrayList<JavaPackage>(jClass.getImportedPackages());
+					            
 					            ArrayList<ARRJavaPackage> classImports = new ArrayList<ARRJavaPackage>();
 					            
 					            for(int l = 0; l < classJImports.size(); l++)
@@ -347,72 +350,90 @@ public class ProjectUtilities {
 	}
 	private static void fixHigherPackages(ArrayList<ARRJavaPackage> importedJPackages) {
 		
-		boolean mustRunAgain = false;
 		//Para cada pacote existente dentro de importedJPackages
 		for(int i = 0; i < importedJPackages.size(); i++)
 		{
 			// Se existe um pai
 			if(getUpperPackageName(importedJPackages.get(i)) != null)
 			{
+				int packageId = -1;
 				boolean existsInList = false;
 				//Verificar se já tenho o pacote "pai" dentro da lista
 				for(int j = 0; j < importedJPackages.size(); j++)
 				{
 					if(importedJPackages.get(j).getName().equals(getUpperPackageName(importedJPackages.get(i))))
+					{
 						existsInList = true;
+						packageId = j;
+					}
 				}
+				//Caso não tenha, cria ele (caso necessário)
+				ARRJavaPackage upperPackage;
+				if(!existsInList)
+					upperPackage = new ARRJavaPackageImpl(getUpperPackageName(importedJPackages.get(i)));
+				else
+					upperPackage = importedJPackages.get(packageId);
+				
+				int oldNClass = upperPackage.getJavaPackage().getClasses().size();
+				
+				//passa por todos os pacotes da lista e 
+				for(int j = 0; j < importedJPackages.size(); j++)
+				{
+					
+					//Adiciona, para todos os que importam os filhos dele, ele mesmo como import;
+					for (int k = 0; k < importedJPackages.get(j).getJavaPackage().getClasses().size(); k ++) 
+				    {
+						boolean alreadyAdd = false;
+						JavaClass jClass = (JavaClass) importedJPackages.get(j).getJavaPackage().getClasses().toArray()[k];
+			            
+						for (int l = 0; l < jClass.getImportedPackages().size(); l++) 
+			            {
+							
+			            	JavaPackage importedPackageFromClass = (JavaPackage) jClass.getImportedPackages().toArray()[l];
+							if(importedPackageFromClass.getName().equals(upperPackage.getName()) && !alreadyAdd)
+							{
+								alreadyAdd = true;
+								jClass.addImportedPackage(upperPackage.getJavaPackage());
+							}
+						}
+				     }
+					
+				}
+				
+				for(int j = 0; j < importedJPackages.size(); j++)
+				{
+					//vê se são parentes
+					if(importedJPackages.get(j).getName().contains(upperPackage.getName()))
+					{
+						System.out.println("Pacote: " + upperPackage.getName() + " contém: " + importedJPackages.get(j).getName());
+						//Adiciona todos as classes do pacote que contém o nome dele, caso não existam ainda;
+						
+						for(int k = 0; k < importedJPackages.get(j).getJavaPackage().getClasses().size(); k++)
+						{
+							if(!upperPackage.getJavaPackage().getClasses().contains(importedJPackages.get(j).getJavaPackage().getClasses().toArray()[k]))
+								upperPackage.getJavaPackage().addClass((JavaClass) importedJPackages.get(j).getJavaPackage().getClasses().toArray()[k]);
+						}
+
+					}
+				}
+				
 				if(!existsInList)
 				{
-					//Caso não tenha, cria ele e passa por todos os pacotes da lista e 
-					ARRJavaPackage upperPackage = new ARRJavaPackage(getUpperPackageName(importedJPackages.get(i)));
-					for(int j = 0; j < importedJPackages.size(); j++)
-					{
-						
-						//Adiciona, para todos os que importam os filhos dele, ele mesmo como import;
-						for (int k = 0; k < importedJPackages.get(j).getClasses().size(); k ++) 
-					    {
-							boolean alreadyAdd = false;
-							JavaClass jClass = (JavaClass) importedJPackages.get(j).getClasses().toArray()[k];
-				            
-							for (int l = 0; l < jClass.getImportedPackages().size(); l++) 
-				            {
-								
-				            	JavaPackage importedPackageFromClass = (JavaPackage) jClass.getImportedPackages().toArray()[l];
-								if(importedPackageFromClass.getName().contains(upperPackage.getName()) && !alreadyAdd)
-								{
-									alreadyAdd = true;
-									jClass.addImportedPackage(upperPackage.getJavaPackage());
-								}
-							}
-					     }
-						
-					}
-					
-					for(int j = 0; j < importedJPackages.size(); j++)
-					{
-						//vê se são parentes
-						if(importedJPackages.get(j).getName().contains(upperPackage.getName()))
-						{
-							System.out.println("Pacote: " + importedJPackages.get(j).getName() + " contém: " + upperPackage.getName());
-							//Adiciona todos as classes do pacote que contém o nome dele, caso não existam ainda;
-							
-							for(int k = 0; k < importedJPackages.get(j).getClasses().size(); k++)
-							{
-								if(!upperPackage.getClasses().contains(importedJPackages.get(j).getClasses().toArray()[k]))
-									upperPackage.getJavaPackage().addClass((JavaClass) importedJPackages.get(j).getClasses().toArray()[k]);
-							}
-
-						}
-					}
-					
 					System.out.println("Adicionando pacote extra de nome: " + upperPackage.getName());
-					System.out.println("Com " + upperPackage.getClasses().size() + " classes;");
-					upperPackage.setSpecial(true);
+					System.out.println("Com " + upperPackage.getJavaPackage().getClasses().size() + " classes;");
+					upperPackage.setSpecialPackage(true);
 					importedJPackages.add(upperPackage);
-					mustRunAgain = true;
 				}
+				else
+				{
+					System.out.println("Editado pacote extra de nome: " + upperPackage.getName());
+					System.out.println("Número de classes antes: " + oldNClass);
+					System.out.println("Agora com " + upperPackage.getJavaPackage().getClasses().size() + " classes;");
+				}
+				
 			}
 		}
+		return;
 		
 	}
 	

@@ -16,7 +16,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
-import arr.general.ARRJavaPackageInterface;
+import arr.general.ARRJavaPackage;
 import arr.general.ArchitecturalDependency;
 import arr.graphiti.features.AddJavaPackageFeature;
 import arr.graphiti.features.AddReferenceFeature;
@@ -39,7 +39,7 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	
 	public  IAddFeature getAddFeature(IAddContext context) {
 	    // is object for add request a ARRJavaPackage?
-	    if (context.getNewObject() instanceof ARRJavaPackageInterface) {
+	    if (context.getNewObject() instanceof ARRJavaPackage) {
 	        return new AddJavaPackageFeature(this);
 	    } else if (context.getNewObject() instanceof ArchitecturalDependency) {
 	        return new AddReferenceFeature(this);
@@ -53,7 +53,7 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	   PictogramElement pictogramElement = context.getPictogramElement();
 	   if (pictogramElement  instanceof ContainerShape) {
 	       Object bo = getBusinessObjectForPictogramElement(pictogramElement);
-	       if (bo instanceof ARRJavaPackageInterface) {
+	       if (bo instanceof ARRJavaPackage) {
 	           return new UpdateJavaPackageFeature(this);
 	       }
 	   }
@@ -65,9 +65,12 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	        IResizeShapeContext context) {
 	    Shape shape = context.getShape();
 	    Object bo = getBusinessObjectForPictogramElement(shape);
-	    if (bo instanceof ARRJavaPackageInterface) {
-	        return new ResizeJavaPackageFeature(this);
-	    }
+
+	    if (bo instanceof ARRJavaPackage) {
+	    	System.out.println("deu certo?" + bo.toString());
+	    	return new ResizeJavaPackageFeature(this);
+	    }	
+	    System.out.println("Objeto Falhou e é: "+ bo.toString());
 	    return super.getResizeShapeFeature(context);
 	}
 	
@@ -75,7 +78,7 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	public ILayoutFeature getLayoutFeature(ILayoutContext context) {
 		PictogramElement pictogramElement = context.getPictogramElement();
 		Object bo = getBusinessObjectForPictogramElement(pictogramElement);
-		if (bo instanceof ARRJavaPackageInterface) {
+		if (bo instanceof ARRJavaPackage) {
 			return new LayoutFeature(this);
 		}
 		return super.getLayoutFeature(context);

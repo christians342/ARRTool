@@ -98,7 +98,7 @@ public class CodeDependencyMatrix {
 		}
 
 	}
-	
+	/*
 	private void printMatrix()
 	{
 		for (int i = 0; i < classElements.size(); i++)
@@ -111,4 +111,5 @@ public class CodeDependencyMatrix {
 		}
 
 	}
+	*/
 }

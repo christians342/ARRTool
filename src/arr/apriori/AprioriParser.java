@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 import arr.general.ARRJavaPackage;
 import arr.general.CodeDependencyMatrix;
-import arr.utils.ProjectUtilities;
+import arr.util.ProjectUtilities;
 
 public class AprioriParser {
 
@@ -29,18 +29,17 @@ public class AprioriParser {
 		Scanner input = new Scanner(spmfFile);
 		int totalNumberOfTransactions = 0;
 		
-		int numberOfElements;
-		boolean foundTargetPackage;
-		boolean multipleTargets;
+		int numberOfTargetPackages;
+		int numberOfBasePackages;
+		
 		while(input.hasNext()) {
-			numberOfElements = 0;
-			foundTargetPackage = false;
-			multipleTargets = false;
+			numberOfBasePackages = 0;
+			numberOfTargetPackages = 0;
 			
 		    String nextLine = input.nextLine();
 		    
-		    ArrayList<ARRJavaPackage> jPackages = new ArrayList<ARRJavaPackage>();
-		    ARRJavaPackage targetJPackage = null;
+		    ArrayList<ARRJavaPackage> targetPackages = new ArrayList<ARRJavaPackage>();
+		    ArrayList<ARRJavaPackage> basePackages = new ArrayList<ARRJavaPackage>();;
 		    
 		    String[] lineTokens = nextLine.split(" #SUP: ");
 		    String[] packageTokens = lineTokens[0].split(" ");
@@ -48,68 +47,97 @@ public class AprioriParser {
 		    for(String s : packageTokens)
 		    {
 		    	if(Integer.parseInt(s) <= matrix.getPackageElements().size())
-		    		jPackages.add(matrix.getPackageElements().get(Integer.parseInt(s)));
-		    	else
 		    	{
-		    		if(foundTargetPackage == true)
-	    				multipleTargets = true;
-		    		targetJPackage = matrix.getPackageElements().get(Integer.parseInt(s) - 10000);
-		    		foundTargetPackage = true;
+		    		numberOfTargetPackages++;
+		    		targetPackages.add(matrix.getPackageElements().get(Integer.parseInt(s)));
 		    	}
-		    	numberOfElements++;
+	    		else
+		    	{
+	    			numberOfBasePackages++;
+		    		basePackages.add(matrix.getPackageElements().get(Integer.parseInt(s) - 10000));
+		    	}
 		    }
 		    
 		    int support = Integer.parseInt(lineTokens[1]);
-		    if(foundTargetPackage == true && multipleTargets == false && numberOfElements > 1)
+		    if(numberOfBasePackages >= 1 && numberOfTargetPackages >= 1)
 		    {
 		    	boolean uselessRule = false;
+		    	
 		    	//Compare all packages to see if it isn't a irrelevant rule
-		    	for(int i = 0; i < jPackages.size(); i++)
+		    	
+		    	//If rule contains packages that are children of themselves in the target packages field
+		    	for(int i = 0; i < targetPackages.size(); i++)
 		    	{
-		    		for(int j = 0; j < jPackages.size(); j++)
+		    		for(int j = 0; j < targetPackages.size(); j++)
 		    		{
-		    			if(jPackages.get(i).getName().contains(jPackages.get(j).getName()) && i != j)
+		    			if(targetPackages.get(i).getName().contains(targetPackages.get(j).getName()) && i != j)
+		    			{
 		    				uselessRule = true;
+		    				break;
+		    			}
 		    		}
 		    	}
 		    	
+		    	//If rule contains packages that are children of themselves in the base packages field
+		    	if(!uselessRule)
+			    	for(int i = 0; i < basePackages.size(); i++)
+			    	{
+				    	for(int j = 0; j < basePackages.size(); j++)
+			    		{
+			    			if(basePackages.get(i).getName().contains(basePackages.get(j).getName()) && i != j)
+			    			{
+			    				uselessRule = true;
+			    				break;
+			    			}
+			    		}
+			    	}
+			    
+		    	// Now check if the target and base packages aren't exactly the same
+		    	int numberOfSamePackages = 0;
 		    	if(!uselessRule)
 		    	{
+	    			if(basePackages.size() == targetPackages.size())
+	    			{
+	    				for(int i = 0; i < basePackages.size(); i++)
+				    	{
+					    	if(targetPackages.contains(basePackages.get(i)))
+					    	{
+					    		numberOfSamePackages++;
+					    	}
+				    	}
+	    			}
+		    	}
+		    	
+		    	if(targetPackages.size() == numberOfSamePackages)
+		    		uselessRule = true;
+		    	
+		    	if(!uselessRule)
+		    	{
+		    		//Fix support value for end rules
+		    		
 		    		double newSupport;
-		    		//TODO: FINISH THIS PROPERLY
-		    		int value = 1;
-		    		for(int i = 0; i < matrix.getPackageElements().size(); i++)
-		    		{
-		    			if(targetJPackage.getName().contains(matrix.getPackageElements().get(i).getName())
-		    					&& matrix.getPackageElements().get(i).getSpecial())
-		    			{
-		    				value++;
-		    			}
-		    		}
 		    		
-		    		for(int i = 0; i < matrix.getPackageElements().size(); i++)
-		    		{
-		    			if(matrix.getPackageElements().get(i).getName().contains(targetJPackage.getName()) && 
-		    					targetJPackage.getSpecial() && matrix.getPackageElements().get(i).getSpecial())
-		    				value--;
-		    		}
-		    		
-		    		
-		    		if(value < 1)
-		    			value = 1;
-		    		
-		    		newSupport = (double) support/(targetJPackage.getJavaPackage().getClasses().size() * value);
-		    		
-		    		
-		    		// Still need to understand why sometimes the support value goes beyond 1 for specially created packages
-		    		if(newSupport > 1)
-		    			newSupport = 1; 
-		    		outputData.add(new AprioriOutput(targetJPackage, jPackages, newSupport));
-		    		
+	    			int numberOfClasses = 0;
+		    		for(int j = 0; j < basePackages.size(); j++)
+		    			numberOfClasses+= basePackages.get(j).getJavaPackage().getClasses().size();
+		    	
+		    		newSupport = (double) support/numberOfClasses;
+	    			outputData.add(new AprioriOutput(basePackages, targetPackages, newSupport));
 		    		totalNumberOfTransactions++;
 		    	}
 		    }
 		}	
+		
+		
+		System.out.println("Debugging basicão: UI.AUTHOR");
+		for(AprioriOutput a : outputData)
+		{
+			if(a.getBasePackages().get(0).getName().contains("br.puc.maspl.ui.author"))
+			{
+				for(int i = 0; i < a.getUsedPackages().size();i++)
+				System.out.println(a.getUsedPackages().get(i).getName());
+			}
+		}
 		
 		input.close();
 		System.out.println("Total number of Transactions: " + Integer.toString(totalNumberOfTransactions));

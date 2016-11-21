@@ -7,14 +7,14 @@ import jdepend.framework.JavaClass;
 public class CodeDependency {
 	
 	private JavaClass jClass;
-	private String targetClassPackageName;
+	private String baseClassPackageName;
 	private ARRJavaPackage jPackage;
 	private IProject iProject;
 	
 	public CodeDependency(JavaClass jClass, ARRJavaPackage jPackage, IProject project)
 	{
 		this.jClass = jClass;
-		this.targetClassPackageName = jClass.getPackageName();
+		this.baseClassPackageName = jClass.getPackageName();
 		this.jPackage = jPackage;
 		this.iProject = project;
 	}
@@ -40,6 +40,6 @@ public class CodeDependency {
 	}
 
 	public String getTargetClassPackageName() {
-		return targetClassPackageName;
+		return baseClassPackageName;
 	}
 }

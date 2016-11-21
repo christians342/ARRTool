@@ -1,4 +1,4 @@
-package arr.utils;
+package arr.util;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -6,8 +6,19 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 import arr.apriori.AprioriOutput;
+import arr.general.ARRJavaPackage;
 import arr.general.CodeDependencyMatrix;
 
 public class FileUtilities {
@@ -42,6 +53,24 @@ public class FileUtilities {
 		fw.close();
 	}
 	
+	public static void saveToModelFile(final ARRJavaPackage obj, final Diagram d) throws CoreException, IOException {
+		URI uri = d.eResource().getURI();
+		uri = uri.trimFragment();
+		uri = uri.trimFileExtension();
+		uri = uri.appendFileExtension("model"); //$NON-NLS-1$
+		ResourceSet rSet = d.eResource().getResourceSet();
+		final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		IResource file = workspaceRoot.findMember(uri.toPlatformString(true));
+		if (file == null || !file.exists()) {
+			Resource createResource = rSet.createResource(uri);
+			createResource.save(Collections.emptyMap());
+			createResource.setTrackingModification(true);
+		}
+		final Resource resource = rSet.getResource(uri, true);
+		resource.getContents().add(obj);
+		
+	}
+	
 	public static void createCSVFileForApriori(ArrayList<AprioriOutput> aOuts, File f) throws IOException
 	{
 		if(f.exists())
@@ -49,17 +78,23 @@ public class FileUtilities {
 		FileWriter fw = new FileWriter(f,false);
 		for(int i = 0; i < aOuts.size(); i++)
 		{
-			if(aOuts.get(i).getTargetPackage().getPackageProject() != null)
-				fw.write(aOuts.get(i).getTargetPackage().getPackageProject().getName() + "." + aOuts.get(i).getTargetPackage().getName());
-			else
+			for(int j = 0; j < aOuts.get(i).getBasePackages().size(); j++)
 			{
-				fw.write(aOuts.get(i).getTargetPackage().getName());
+				if(aOuts.get(i).getBasePackages().get(j).getPackageProjectName() != null)
+					fw.write(aOuts.get(i).getBasePackages().get(j).getPackageProjectName() + "." + aOuts.get(i).getBasePackages().get(j).getName());
+				else
+				{
+					fw.write(aOuts.get(i).getBasePackages().get(j).getName());
+				}
+				if((j + 1) != aOuts.get(i).getBasePackages().size())
+					fw.write(";");
 			}
+			
 			fw.write(",");
-			for(int j = 0; j < aOuts.get(i).getjPackages().size(); j++)
+			for(int j = 0; j < aOuts.get(i).getUsedPackages().size(); j++)
 			{
-				fw.write(aOuts.get(i).getjPackages().get(j).getPackageProject().getName() + "." + aOuts.get(i).getjPackages().get(j).getName());
-				if((j + 1) != aOuts.get(i).getjPackages().size())
+				fw.write(aOuts.get(i).getUsedPackages().get(j).getPackageProjectName() + "." + aOuts.get(i).getUsedPackages().get(j).getName());
+				if((j + 1) != aOuts.get(i).getUsedPackages().size())
 					fw.write(";");
 			}
 			fw.write(",");
@@ -94,7 +129,7 @@ public class FileUtilities {
 			{
 				for ( int j = 0; j < dmatrix.getPackageElements().size(); j++)
 				{
-					if (dmatrix.getPackageElements().get(j).getClasses().contains(dmatrix.getClassElements().get(i)))
+					if (dmatrix.getPackageElements().get(j).getJavaPackage().getClasses().contains(dmatrix.getClassElements().get(i)))
 					{
 						fw.write(Integer.toString(j + 10000) + " ");
 					}

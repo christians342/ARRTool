@@ -10,7 +10,7 @@ import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 
-import arr.general.ARRJavaPackageInterface;
+import arr.general.ARRJavaPackage;
 
 public class UpdateJavaPackageFeature extends AbstractUpdateFeature {
 	 
@@ -23,7 +23,7 @@ public class UpdateJavaPackageFeature extends AbstractUpdateFeature {
         // return true, if linked business object is a jPackage
         Object bo =
             getBusinessObjectForPictogramElement(context.getPictogramElement());
-        return (bo instanceof ARRJavaPackageInterface);
+        return (bo instanceof ARRJavaPackage);
     }
     
 	@Override
@@ -44,8 +44,8 @@ public class UpdateJavaPackageFeature extends AbstractUpdateFeature {
         // retrieve name from business model
         String businessName = null;
         Object bo = getBusinessObjectForPictogramElement(pictogramElement);
-        if (bo instanceof ARRJavaPackageInterface) {
-        	ARRJavaPackageInterface jPackage = (ARRJavaPackageInterface) bo;
+        if (bo instanceof ARRJavaPackage) {
+        	ARRJavaPackage jPackage = (ARRJavaPackage) bo;
             businessName = jPackage.getName();
         }
  
@@ -66,8 +66,8 @@ public class UpdateJavaPackageFeature extends AbstractUpdateFeature {
         String businessName = null;
         PictogramElement pictogramElement = context.getPictogramElement();
         Object bo = getBusinessObjectForPictogramElement(pictogramElement);
-        if (bo instanceof ARRJavaPackageInterface) {
-        	ARRJavaPackageInterface jPackage = (ARRJavaPackageInterface) bo;
+        if (bo instanceof ARRJavaPackage) {
+        	ARRJavaPackage jPackage = (ARRJavaPackage) bo;
             businessName = jPackage.getName();
         }
  

@@ -17,7 +17,7 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 
-import arr.general.ARRJavaPackageInterface;
+import arr.general.ARRJavaPackage;
 
 public class LayoutFeature extends AbstractLayoutFeature {
 
@@ -37,7 +37,7 @@ public class LayoutFeature extends AbstractLayoutFeature {
     	   return false;
        EList<EObject> businessObjects = pe.getLink().getBusinessObjects();
        return businessObjects.size() == 1 
-              && businessObjects.get(0) instanceof ARRJavaPackageInterface;
+              && businessObjects.get(0) instanceof ARRJavaPackage;
     }
  
     public boolean layout(ILayoutContext context) {

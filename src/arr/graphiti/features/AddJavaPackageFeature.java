@@ -1,12 +1,10 @@
 package arr.graphiti.features;
 
 import org.eclipse.graphiti.examples.tutorial.StyleUtil;
-import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
-import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
@@ -32,11 +30,12 @@ public class AddJavaPackageFeature extends AbstractAddShapeFeature {
 	}
 
 	public boolean canAdd(IAddContext context) {
-		// check if user wants to add a EClass
+		// check if user wants to add a ARRJavaPackage
 		final Object newObject = context.getNewObject();
 		if (newObject instanceof ARRJavaPackage) {
 			// check if user wants to add to a diagram
 			if (context.getTargetContainer() instanceof Diagram) {
+				System.out.println("De fato estou adicionando uma coisa que é instanceof ARRJavaPackage");
 				return true;
 			}
 		}
@@ -66,72 +65,54 @@ public class AddJavaPackageFeature extends AbstractAddShapeFeature {
 
  			// create and set visible rectangle inside invisible rectangle
  			roundedRectangle = gaService.createPlainRoundedRectangle(invisibleRectangle, 5, 5);
- 			roundedRectangle.setStyle(StyleUtil.getStyleForEClass(getDiagram()));
+ 			roundedRectangle.setStyle(StyleUtil.getStyleForEClass(targetDiagram));
  			gaService.setLocationAndSize(roundedRectangle, 0, 0, width, height);
 
  			// if addedClass has no resource we add it to the resource of the diagram
  			// in a real scenario the business model would have its own resource
  			if (addedPackage.eResource() == null) {
  				getDiagram().eResource().getContents().add(addedPackage);
- 			}
+			}
  			
  			// create link and wire it
  			link(containerShape, addedPackage);
  		}
+ 		
 
- 		// SHAPE WITH LINE
- 		{
- 			// create shape for line
- 			final Shape shape = peCreateService.createShape(containerShape, false);
+		// SHAPE WITH TEXT
+		{
+			// create shape for text
+			final Shape shape = peCreateService.createShape(containerShape, false);
 
- 			// create and set graphics algorithm
- 			final Polyline polyline = gaService.createPlainPolyline(shape, new int[] { 0, 20, width, 20 });
- 			polyline.setStyle(StyleUtil.getStyleForEClass(getDiagram()));
- 		}
+			// create and set text graphics algorithm
+			final Text text = gaService.createPlainText(shape, addedPackage.getName());
+			text.setStyle(StyleUtil.getStyleForEClassText(targetDiagram));
+			gaService.setLocationAndSize(text, 0, 0, width, 20);
 
- 		// SHAPE WITH TEXT
- 		{
- 			// create shape for text
- 			final Shape shape = peCreateService.createShape(containerShape, false);
+			// create link and wire it
+			link(shape, addedPackage);
+		}
 
- 			// create and set text graphics algorithm
- 			final Text text = gaService.createPlainText(shape, addedPackage.getName());
- 			text.setStyle(StyleUtil.getStyleForEClassText(getDiagram()));
- 			gaService.setLocationAndSize(text, 0, 0, width, 20);
+		// add a chopbox anchor to the shape
+		peCreateService.createChopboxAnchor(containerShape);
 
- 			// create link and wire it
- 			link(shape, addedPackage);
+		// create an additional box relative anchor at middle-right
+		final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
+		boxAnchor.setRelativeWidth(1.0);
+		boxAnchor.setRelativeHeight(0.38); // Use golden section
 
- 			// provide information to support direct-editing directly
- 			// after object creation (must be activated additionally)
- 			final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
- 			// set container shape for direct editing after object creation
- 			directEditingInfo.setMainPictogramElement(containerShape);
- 			// set shape and graphics algorithm where the editor for
- 			// direct editing shall be opened after object creation
- 			directEditingInfo.setPictogramElement(shape);
- 			directEditingInfo.setGraphicsAlgorithm(text);
- 		}
+		// anchor references visible rectangle instead of invisible rectangle
+		boxAnchor.setReferencedGraphicsAlgorithm(roundedRectangle);
 
- 		// add a chopbox anchor to the shape
- 		peCreateService.createChopboxAnchor(containerShape);
+		// assign a graphics algorithm for the box relative anchor
+		final Ellipse ellipse = gaService.createPlainEllipse(boxAnchor);
 
- 		// create an additional box relative anchor at middle-right
- 		final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
- 		boxAnchor.setRelativeWidth(1.0);
- 		boxAnchor.setRelativeHeight(0.38); // Use golden section
+		// anchor is located on the right border of the visible rectangle
+		// and touches the border of the invisible rectangle
+		final int w = INVISIBLE_RECT_RIGHT;
+		gaService.setLocationAndSize(ellipse, -w, -w, 2 * w, 2 * w);
+		ellipse.setStyle(StyleUtil.getStyleForEClass(targetDiagram));
 
- 		// anchor references visible rectangle instead of invisible rectangle
- 		boxAnchor.setReferencedGraphicsAlgorithm(roundedRectangle);
-
- 		// assign a graphics algorithm for the box relative anchor
- 		final Ellipse ellipse = gaService.createPlainEllipse(boxAnchor);
-
- 		// anchor is located on the right border of the visible rectangle
- 		// and touches the border of the invisible rectangle
- 		final int w = INVISIBLE_RECT_RIGHT;
- 		gaService.setLocationAndSize(ellipse, -w, -w, 2 * w, 2 * w);
- 		ellipse.setStyle(StyleUtil.getStyleForEClass(getDiagram()));
 
  		// call the layout feature
  		layoutPictogramElement(containerShape);

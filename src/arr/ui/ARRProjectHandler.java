@@ -14,7 +14,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import arr.apriori.Apriori;
-import arr.utils.ProjectUtilities;
+import arr.util.ProjectUtilities;
 
 public class ARRProjectHandler extends AbstractHandler {
 
