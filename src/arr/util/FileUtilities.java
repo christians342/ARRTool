@@ -17,7 +17,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
-import arr.apriori.AprioriOutput;
+import arr.algorithms.AlgorithmOutput;
 import arr.general.ARRJavaPackage;
 import arr.general.CodeDependencyMatrix;
 
@@ -71,7 +71,7 @@ public class FileUtilities {
 		
 	}
 	
-	public static void createCSVFileForApriori(ArrayList<AprioriOutput> aOuts, File f) throws IOException
+	public static void createCSVFileForAlgorithms(ArrayList<AlgorithmOutput> aOuts, File f) throws IOException
 	{
 		if(f.exists())
 			Files.delete(f.toPath());
@@ -121,6 +121,7 @@ public class FileUtilities {
 				if(dmatrix.getMatrix()[i][j] == true)
 				{
 					fw.write(Integer.toString(j) + " ");
+					System.out.println(dmatrix.getPackageElements().get(j).getName() + " " + Integer.toString(j));
 					classUsed = true;
 				}
 			}
@@ -132,6 +133,7 @@ public class FileUtilities {
 					if (dmatrix.getPackageElements().get(j).getJavaPackage().getClasses().contains(dmatrix.getClassElements().get(i)))
 					{
 						fw.write(Integer.toString(j + 10000) + " ");
+						System.out.println(dmatrix.getPackageElements().get(j).getName() + " " + Integer.toString(j)+10000);
 					}
 				}
 				if(dmatrix.getClassElements().size() != (i+1))
@@ -141,7 +143,7 @@ public class FileUtilities {
 			classUsed = false;
 		}
 		fw.close();
-		
+		System.out.println("Arquivo criado.");
 		return f;
 	}
 	

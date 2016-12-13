@@ -15,11 +15,11 @@ public class CodeDependencyMatrix {
 	private ArrayList<JavaClass> classElements;
 	private ArrayList<CodeDependency> dependencyList;
 	
-	public CodeDependencyMatrix( ArrayList<JavaClass> projectClasses, ArrayList<ARRJavaPackage> projectPackages, ArrayList<CodeDependency> dependencyCollection){
+	public CodeDependencyMatrix( ArrayList<JavaClass> projectClasses, ArrayList<ARRJavaPackage> projectPackages, ArrayList<CodeDependency> dependencyList){
 		matrix = new boolean[projectClasses.size()][projectPackages.size()];
 		this.classElements = projectClasses;
 		this.packageElements = projectPackages;
-		this.dependencyList = dependencyCollection;
+		this.dependencyList = dependencyList;
 		matrix = new boolean[projectClasses.size()][projectPackages.size()];
 		for(int i = 0; i < projectClasses.size(); i++)
 			for(int j = 0; j < projectPackages.size(); j++)
@@ -30,9 +30,9 @@ public class CodeDependencyMatrix {
 		System.out.println("\nCalculando Matriz de dependências para o SPMF:");
 		System.out.println("Número de classes: " + classElements.size() + "\nNúmero de Pacotes: "+ packageElements.size() +"\nNúmero de dependências: "+ dependencyList.size());
 		
-		//System.out.println("\nDependências encontradas:\n(Classe, Pacote)");
-		//for(CodeDependency d : dependencyList)
-		//	System.out.println(d.getjClass().getName() + ", " + d.getjPackage().getName());
+		System.out.println("\nDependências encontradas:\n(Classe, Pacote)");
+		for(CodeDependency d : dependencyList)
+			System.out.println(d.getjClass().getName() + ", " + d.getjPackage().getName());
 		
 		//System.out.println("\nClasses encontradas:");
 		//for(JavaClass jClass : classElements)

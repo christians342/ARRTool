@@ -6,8 +6,11 @@ import java.util.Random;
 
 public class ColorGenerator {
 
+	// The output that will be used by other members
 	static ArrayList<Color> colors;
 	
+	// Generate random N colors, where N is the input.
+	// The general idea is to mix the colors with a shade of white, making them appear to have a "nicer and cleaner" look;
 	public static void generateRandomColors(int n)
 	{
 		colors = new ArrayList<Color>();
@@ -16,7 +19,6 @@ public class ColorGenerator {
 		
 		for(int i = 0; i < n; i++)
 		{
-			System.out.println("Cor: " + i);
 		    Random random = new Random();
 		    int red = random.nextInt(256);
 		    int green = random.nextInt(256);

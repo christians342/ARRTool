@@ -2,7 +2,6 @@
  */
 package arr.general;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.emf.ecore.EObject;
 
 import jdepend.framework.JavaPackage;

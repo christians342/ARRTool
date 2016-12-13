@@ -6,6 +6,8 @@ import arr.general.ARRJavaPackage;
 import arr.general.ArchitecturalDependency;
 import arr.general.GeneralPackage;
 
+import java.io.Serializable;
+
 import org.eclipse.emf.common.notify.Notification;
 
 import org.eclipse.emf.ecore.EClass;
@@ -30,7 +32,12 @@ import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
  *
  * @generated
  */
-public class ArchitecturalDependencyImpl extends MinimalEObjectImpl.Container implements ArchitecturalDependency {
+public class ArchitecturalDependencyImpl extends MinimalEObjectImpl.Container implements ArchitecturalDependency, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5817139463773541307L;
+
 	/**
 	 * The default value of the '{@link #getId() <em>Id</em>}' attribute.
 	 * <!-- begin-user-doc -->

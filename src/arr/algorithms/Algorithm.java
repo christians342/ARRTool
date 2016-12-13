@@ -1,4 +1,4 @@
-package arr.apriori;
+package arr.algorithms;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,12 +12,12 @@ import org.eclipse.ui.PlatformUI;
 import arr.general.CodeDependencyMatrix;
 import arr.ui.ARRDataView;
 import arr.ui.MessageSystem;
-import arr.ui.OptionsView;
+import arr.ui.AlgorithmOptionsView;
 import arr.util.FileUtilities;
 import arr.util.ProjectUtilities;
 import ca.pfv.spmf.algorithms.frequentpatterns.apriori.AlgoApriori;
 
-public class Apriori {
+public class Algorithm {
 
 	public static boolean run(ArrayList<IProject> projects)
 	{
@@ -51,26 +51,31 @@ public class Apriori {
 			// Something didn't work properly, tells the user that the software didn't finish the calculation of the matrix
 			MessageSystem.matrixError();
 			return false;
-		}				
+		}
+		
+		System.out.println("Rodando Algoritmo do SPMF");
 		if(spmfData != null)
 		{
-			double minsup = OptionsView.minsup;
+			double minsup = AlgorithmOptionsView.minsup;
 			// Applying the Apriori algorithm
 			AlgoApriori apriori = new AlgoApriori();
 			try {
 				apriori.runAlgorithm(minsup, spmfData.toPath().toString(), projects.get(0).getLocation().toString() + File.separator + "out.spmf");
 			} catch (IOException e) {
+				System.out.println("Erro ao executar o algoritmo do SPMF");
 				MessageSystem.jdependProblem();
 				e.printStackTrace();
 				return false;
 			}
 		}
+		
+		System.out.println("Parsing da saída do algoritmo do SPMF");
 		File aprioriOutFile = new File(projects.get(0).getLocation().toString() + File.separator + "out.spmf");
 		if(!aprioriOutFile.exists())
 			return false;
-		ArrayList<AprioriOutput> aprioriParsedOutputs = new ArrayList<AprioriOutput>();
+		ArrayList<AlgorithmOutput> aprioriParsedOutputs = new ArrayList<AlgorithmOutput>();
 
-		AprioriParser aParser = new AprioriParser(aprioriOutFile);
+		AlgorithmParser aParser = new AlgorithmParser(aprioriOutFile);
 		try {
 			aprioriParsedOutputs = aParser.parse();
 		} catch (FileNotFoundException e) {
@@ -83,7 +88,7 @@ public class Apriori {
 		try {
 			ARRDataView view = (ARRDataView) 
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView( "architecture_rules_recovery.views.ARRDataView");
-			for(AprioriOutput a : aprioriParsedOutputs)
+			for(AlgorithmOutput a : aprioriParsedOutputs)
 				view.getViewer().add(a);
 			
 		} catch (PartInitException e) {

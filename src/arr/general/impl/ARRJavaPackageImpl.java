@@ -6,7 +6,8 @@ import arr.general.ARRJavaPackage;
 import arr.general.GeneralPackage;
 import jdepend.framework.JavaPackage;
 
-import org.eclipse.core.resources.IProject;
+import java.io.Serializable;
+
 import org.eclipse.emf.common.notify.Notification;
 
 import org.eclipse.emf.ecore.EClass;
@@ -29,7 +30,12 @@ import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
  *
  * @generated
  */
-public class ARRJavaPackageImpl extends MinimalEObjectImpl.Container implements ARRJavaPackage {
+public class ARRJavaPackageImpl extends MinimalEObjectImpl.Container implements ARRJavaPackage, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -955532897097178919L;
+
 	/**
 	 * The default value of the '{@link #isSpecialPackage() <em>Special Package</em>}' attribute.
 	 * <!-- begin-user-doc -->

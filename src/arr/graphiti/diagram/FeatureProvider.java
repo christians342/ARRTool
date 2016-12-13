@@ -6,12 +6,9 @@ import org.eclipse.graphiti.features.ICreateConnectionFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.ILayoutFeature;
 import org.eclipse.graphiti.features.IResizeShapeFeature;
-import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
-import org.eclipse.graphiti.features.context.IUpdateContext;
-import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
@@ -24,8 +21,6 @@ import arr.graphiti.features.CreateDependencyFeature;
 import arr.graphiti.features.CreateJavaPackageFeature;
 import arr.graphiti.features.LayoutFeature;
 import arr.graphiti.features.ResizeJavaPackageFeature;
-import arr.graphiti.features.UpdateJavaPackageFeature;
-
 public class FeatureProvider extends DefaultFeatureProvider {
 
     public FeatureProvider(IDiagramTypeProvider dtp) {
@@ -47,7 +42,8 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	    
 	    return super.getAddFeature(context);
 	}
-	
+
+	/*
 	@Override
 	public IUpdateFeature getUpdateFeature(IUpdateContext context) {
 	   PictogramElement pictogramElement = context.getPictogramElement();
@@ -60,6 +56,8 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	   return super.getUpdateFeature(context);
 	 }
 	
+	*/
+	
 	@Override
 	public IResizeShapeFeature getResizeShapeFeature(
 	        IResizeShapeContext context) {
@@ -67,10 +65,8 @@ public class FeatureProvider extends DefaultFeatureProvider {
 	    Object bo = getBusinessObjectForPictogramElement(shape);
 
 	    if (bo instanceof ARRJavaPackage) {
-	    	System.out.println("deu certo?" + bo.toString());
 	    	return new ResizeJavaPackageFeature(this);
 	    }	
-	    System.out.println("Objeto Falhou e é: "+ bo.toString());
 	    return super.getResizeShapeFeature(context);
 	}
 	

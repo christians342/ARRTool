@@ -22,12 +22,10 @@ public class ResizeJavaPackageFeature extends DefaultResizeShapeFeature {
             // don't allow resize if the package name has the length of less than or equal to 1
             Shape shape = context.getShape();
             Object bo = getBusinessObjectForPictogramElement(shape);
-            if (bo instanceof ARRJavaPackage) {
-            	ARRJavaPackage p = (ARRJavaPackage) bo;
-                if (p.getName() != null && p.getName().length() <= 1) {
-                    canResize = false;
-                }
-            }
+            
+            if (bo instanceof ARRJavaPackage)
+                canResize = true;
+            
         }
         return canResize;
     }

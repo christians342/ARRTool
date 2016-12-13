@@ -10,6 +10,7 @@ import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.impl.AbstractLayoutFeature;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
+import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Point;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -77,6 +78,9 @@ public class LayoutFeature extends AbstractLayoutFeature {
             anythingChanged = true;
         }
      
+        int rectangleHeight =
+                containerGa.getHeight();
+        
         // width of text and line (same as visible rectangle)
         Iterator<Shape> iter = containerShape.getChildren().iterator();
         while (iter.hasNext()) {
@@ -99,6 +103,12 @@ public class LayoutFeature extends AbstractLayoutFeature {
                         rectangleWidth);
                     anythingChanged = true;
                 }
+            }
+            if(rectangleHeight != size.getHeight() && graphicsAlgorithm instanceof Text && !graphicsAlgorithm.getStyle().getId().contains("ECLASS"))
+            {
+            	gaService.setHeight(graphicsAlgorithm,
+            			rectangleHeight);
+                    anythingChanged = true;
             }
         }
      

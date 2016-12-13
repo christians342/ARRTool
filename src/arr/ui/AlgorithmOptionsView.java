@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
 
-public class OptionsView extends Shell {
+public class AlgorithmOptionsView extends Shell {
 	private Text text;
 	public static int alg = 0;
 	public static float minsup = 0.000001f;
@@ -24,7 +24,7 @@ public class OptionsView extends Shell {
 	public static void main(String args[]) {
 		try {
 			Display display = Display.getDefault();
-			OptionsView shell = new OptionsView(display);
+			AlgorithmOptionsView shell = new AlgorithmOptionsView(display);
 			shell.open();
 			shell.layout();
 			while (!shell.isDisposed()) {
@@ -41,7 +41,7 @@ public class OptionsView extends Shell {
 	 * Create the shell.
 	 * @param display
 	 */
-	public OptionsView(Display display) {
+	public AlgorithmOptionsView(Display display) {
 		super(display, SWT.SHELL_TRIM);
 		createContents();
 	}

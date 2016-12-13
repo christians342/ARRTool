@@ -51,8 +51,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 
-import arr.apriori.Apriori;
-import arr.apriori.AprioriOutput;
+import arr.algorithms.Algorithm;
+import arr.algorithms.AlgorithmOutput;
 import arr.util.FileUtilities;
 import arr.util.ProjectUtilities;
 
@@ -72,6 +72,7 @@ public class ARRDataView extends ViewPart {
 	private Action actionExportSPMF;
 	private Action actionOpenProperties;
 	private Action actionCreateDiagram;
+	private Action actionOpenDiagramProperties;
 
 	static DecimalFormat df = new DecimalFormat("#.###");
 	
@@ -124,7 +125,7 @@ public class ARRDataView extends ViewPart {
 		targetPackageColumn.setLabelProvider(new ColumnLabelProvider() {
 			  @Override
 			  public String getText(Object element) {
-			    AprioriOutput p = (AprioriOutput) element;
+			    AlgorithmOutput p = (AlgorithmOutput) element;
 			    String output = "";
 			    for(int i = 0; i < p.getBasePackages().size(); i++)
 			    {
@@ -141,7 +142,7 @@ public class ARRDataView extends ViewPart {
 		usedPackagesColumn.setLabelProvider(new ColumnLabelProvider() {
 			  @Override
 			  public String getText(Object element) {
-			    AprioriOutput e = (AprioriOutput) element;
+			    AlgorithmOutput e = (AlgorithmOutput) element;
 			    String output = "";
 			    for(int i = 0; i < e.getUsedPackages().size(); i++)
 			    {
@@ -159,7 +160,7 @@ public class ARRDataView extends ViewPart {
 		suportColumn.setLabelProvider(new ColumnLabelProvider() {
 			  @Override
 			  public String getText(Object element) {
-			    AprioriOutput e = (AprioriOutput) element;
+			    AlgorithmOutput e = (AlgorithmOutput) element;
 			    return df.format(e.getSuport());
 			  }
 			});
@@ -199,6 +200,7 @@ public class ARRDataView extends ViewPart {
 		manager.add(actionCreateDiagram);
 		manager.add(new Separator());
 		manager.add(actionOpenProperties);
+		manager.add(actionOpenDiagramProperties);
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
@@ -210,6 +212,7 @@ public class ARRDataView extends ViewPart {
 		manager.add(actionCreateDiagram);
 		manager.add(new Separator());
 		manager.add(actionOpenProperties);
+		manager.add(actionOpenDiagramProperties);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -223,6 +226,7 @@ public class ARRDataView extends ViewPart {
 		manager.add(actionCreateDiagram);
 		manager.add(new Separator());
 		manager.add(actionOpenProperties);
+		manager.add(actionOpenDiagramProperties);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -239,7 +243,7 @@ public class ARRDataView extends ViewPart {
 					return;
 				}
 				projects.add(0, null);
-				if(Apriori.run(projects))
+				if(Algorithm.run(projects))
 					MessageSystem.sucessfullyFinished();
 				
 				return;
@@ -256,7 +260,7 @@ public class ARRDataView extends ViewPart {
 		        projects.addAll(Arrays.asList(ProjectUtilities.getProjectsFromWorkspace()));
 		        
 		        // Shows a message that tells that the code already finished
-		        if(Apriori.run(projects))
+		        if(Algorithm.run(projects))
 				MessageSystem.sucessfullyFinished();
 				
 		        return;
@@ -313,7 +317,7 @@ public class ARRDataView extends ViewPart {
 			    if (csvFile != null) {
 			    	File selectedFile = new File(csvFile);
 				    try {
-						FileUtilities.createCSVFileForApriori(ProjectUtilities.getaOuts(), selectedFile);
+						FileUtilities.createCSVFileForAlgorithms(ProjectUtilities.getaOuts(), selectedFile);
 					} catch (IOException e) {
 						MessageSystem.fileProblem();
 						e.printStackTrace();
@@ -342,7 +346,7 @@ public class ARRDataView extends ViewPart {
 				if (dialog.open() != Dialog.OK) {
 					return;
 				}
-				String diagramName = dialog.getValue();
+				String diagramName = DiagramOptionsView.diagramName;
 
 				// Get the default resource set to hold the new resource
 				ResourceSet resourceSet = new ResourceSetImpl();
@@ -392,7 +396,7 @@ public class ARRDataView extends ViewPart {
 		actionOpenProperties = new Action() {
 			public void run()
 			{
-				OptionsView oView = new OptionsView(Display.getCurrent());
+				AlgorithmOptionsView oView = new AlgorithmOptionsView(Display.getCurrent());
 				oView.open();
 			}
 		};
@@ -400,7 +404,22 @@ public class ARRDataView extends ViewPart {
 		actionOpenProperties.setToolTipText("Open algorithm selection options and it's parameters.");
 		actionOpenProperties.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
 				getImageDescriptor(ISharedImages.IMG_OBJS_TASK_TSK));
-
+		
+		actionOpenDiagramProperties = new Action() {
+			public void run()
+			{
+				DiagramOptionsView dView = new DiagramOptionsView(Display.getCurrent());
+				dView.open();
+			}
+		};
+		
+		actionOpenDiagramProperties.setText("Open Diagram Options");
+		actionOpenDiagramProperties.setToolTipText("Open Diagram Generation options and it's parameters.");
+		actionOpenDiagramProperties.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
+				getImageDescriptor(ISharedImages.IMG_OBJS_TASK_TSK));
+		
+		
+		
 	}
 	
 	public TableViewer getViewer()

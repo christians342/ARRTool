@@ -1,4 +1,4 @@
-package arr.apriori;
+package arr.algorithms;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,23 +9,23 @@ import arr.general.ARRJavaPackage;
 import arr.general.CodeDependencyMatrix;
 import arr.util.ProjectUtilities;
 
-public class AprioriParser {
+public class AlgorithmParser {
 
 	File spmfFile;
 	CodeDependencyMatrix matrix;
 	
-	public AprioriParser(File f)
+	public AlgorithmParser(File f)
 	{
 		spmfFile = f;
 		matrix = ProjectUtilities.getDependencyMatrix();
 	}
 	
-	public ArrayList<AprioriOutput> parse() throws FileNotFoundException
+	public ArrayList<AlgorithmOutput> parse() throws FileNotFoundException
 	{
 		if(!spmfFile.exists() || !spmfFile.isFile())
 			return null;
 		
-		ArrayList<AprioriOutput> outputData = new ArrayList<AprioriOutput>();
+		ArrayList<AlgorithmOutput> outputData = new ArrayList<AlgorithmOutput>();
 		Scanner input = new Scanner(spmfFile);
 		int totalNumberOfTransactions = 0;
 		
@@ -122,7 +122,7 @@ public class AprioriParser {
 		    			numberOfClasses+= basePackages.get(j).getJavaPackage().getClasses().size();
 		    	
 		    		newSupport = (double) support/numberOfClasses;
-	    			outputData.add(new AprioriOutput(basePackages, targetPackages, newSupport));
+	    			outputData.add(new AlgorithmOutput(basePackages, targetPackages, newSupport));
 		    		totalNumberOfTransactions++;
 		    	}
 		    }
@@ -130,7 +130,7 @@ public class AprioriParser {
 		
 		
 		System.out.println("Debugging basicão: UI.AUTHOR");
-		for(AprioriOutput a : outputData)
+		for(AlgorithmOutput a : outputData)
 		{
 			if(a.getBasePackages().get(0).getName().contains("br.puc.maspl.ui.author"))
 			{

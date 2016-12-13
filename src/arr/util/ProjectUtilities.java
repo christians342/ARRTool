@@ -28,8 +28,8 @@ import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.Workbench;
 
-import arr.apriori.AprioriOutput;
 import arr.general.impl.ARRJavaPackageImpl;
+import arr.algorithms.AlgorithmOutput;
 import arr.general.ARRJavaPackage;
 import arr.general.CodeDependency;
 import arr.general.CodeDependencyMatrix;
@@ -43,7 +43,7 @@ import jdepend.framework.JavaPackage;
 public class ProjectUtilities {
 	private static CodeDependencyMatrix dependencyMatrix;
 	private static boolean dependencyMatrixStatus = false;
-	private static ArrayList<AprioriOutput> aOuts;
+	private static ArrayList<AlgorithmOutput> aOuts;
 	
 	// Returns true if the dependency matrix was set at least one time while the project was running (aka the program was run at least one time)
 	public static boolean getDependencyMatrixStatus()
@@ -158,6 +158,7 @@ public class ProjectUtilities {
 		}
 		ArrayList<String> projectsSrcPath = new ArrayList<String>();
 		ArrayList<String> projectsClassPath = new ArrayList<String>();
+		
 		//TODO : check the reason why I need to remove the first project (RemoteSystemsTempFiles)
 		projects.remove(0);
 		
@@ -220,6 +221,20 @@ public class ProjectUtilities {
 		//Using jDepend to analyze the selected files
 		ArrayList<JavaPackage> importedJPackages = new ArrayList<JavaPackage>(jdepend.analyze());
 		
+		for(int i = 0; i < importedJPackages.size(); i++)
+		{
+			for(int j = 0; j < importedJPackages.get(i).getClasses().size(); j++)
+			{
+				JavaClass c = (JavaClass) importedJPackages.get(i).getClasses().toArray()[j];
+				System.out.println("Analisando classe: " + c.getName());
+				for(int k = 0; k < c.getImportedPackages().size(); k++)
+				{
+					System.out.println("Depende de: " + ((JavaPackage) c.getImportedPackages().toArray()[k]).getName());
+				}
+			}	
+		}
+		
+		
 		ArrayList<ARRJavaPackage> importedPackages = new ArrayList<ARRJavaPackage>();
 		for(int i = 0; i < importedJPackages.size(); i++)
 		{
@@ -251,9 +266,9 @@ public class ProjectUtilities {
 					{
 						String path = folder.getCanonicalPath();
 						//System.out.println("\nComparação: (Se A contém B)");
-						//System.out.println("A : " + projectPath);
-						//System.out.println("B : " + path);
-						
+						//System.out.println("B : " + projectPath);
+						//System.out.println("A : " + path);
+
 						if(path.contains(projectPath))
 						{
 							//System.out.println("A continha B.");
@@ -261,9 +276,9 @@ public class ProjectUtilities {
 							relativePath = relativePath.replace('\\', '.');
 							if(relativePath.length()>= 1)
 								relativePath = relativePath.substring(1);
-							//System.out.println("RelativePath:");
-							//System.out.println(relativePath);
-							if(tempPackage.getElementName().equals(relativePath) && tempPackage.getElementName().length() >= 1)
+							//System.out.println("RelativePath:" + relativePath);
+							
+							if(tempPackage.getElementName().equals(relativePath) && tempPackage.getElementName().length() >= 4)
 							{
 								//System.out.println("Adding something to filteredClasspathPackages");
 								filteredClasspathPackages.add(tempPackage);
@@ -275,17 +290,18 @@ public class ProjectUtilities {
 			}
 
 			//Compare the imported packages name with the found packages name, if the name is the same we keep the data, otherwise it is a library input (.jar or system lib)
-			Iterator<ARRJavaPackage> i = importedPackages.iterator();
+			Iterator<ARRJavaPackage> im = importedPackages.iterator();
 			ArrayList<CodeDependency> dependencies = new ArrayList<CodeDependency>();
 			ArrayList<JavaClass> projectClasses = new ArrayList<JavaClass>();
 			ArrayList<ARRJavaPackage> projectPackages = new ArrayList<ARRJavaPackage>();
 			
 			// Stores all the project(s) packages first, then run for the classes within them
-			while (i.hasNext()) 
+			while (im.hasNext()) 
 			{
-				ARRJavaPackage jPackage = (ARRJavaPackage) i.next();
+				ARRJavaPackage jPackage = (ARRJavaPackage) im.next();
 				 for (IPackageFragment mypackage : filteredClasspathPackages) 
 				 {
+					//System.out.println(jPackage.getName() + " e " + mypackage.getElementName());
 					if(jPackage.getName().equals(mypackage.getElementName()))
 				    {
 						 jPackage.setPackageProjectName(mypackage.getJavaProject().getProject().getName());
@@ -295,45 +311,43 @@ public class ProjectUtilities {
 				 }
 			}
 			
-			i = importedPackages.iterator();
-			
-			while (i.hasNext()) 
+			//Para cada pacote
+			for(int i = 0; i < importedPackages.size(); i++)
 			{
-				ARRJavaPackage jPackage = (ARRJavaPackage) i.next();
-				 for (IPackageFragment mypackage : filteredClasspathPackages) 
-				 {
-					if(jPackage.getName().equals(mypackage.getElementName()))
-				    {
-						 
-						 Collection<?> classes = jPackage.getJavaPackage().getClasses();
-					     for (Iterator<?> j = classes.iterator(); j.hasNext();) 
-					     {
-					            JavaClass jClass = (JavaClass)j.next();
-
-					            if(!projectClasses.contains(jClass))
-					            	projectClasses.add(jClass);
-					            ArrayList<JavaPackage> classJImports = new ArrayList<JavaPackage>(jClass.getImportedPackages());
-					            
-					            ArrayList<ARRJavaPackage> classImports = new ArrayList<ARRJavaPackage>();
-					            
-					            for(int l = 0; l < classJImports.size(); l++)
-					            	for (int m = 0; m < projectPackages.size(); m++)
-					            		if(projectPackages.get(m).getJavaPackage().equals(classJImports.get(l)))
-					            			classImports.add(projectPackages.get(m));
-					            
-					            for (Iterator<?> k = classImports.iterator(); k.hasNext();) 
-					            {
-					            	ARRJavaPackage importedPackageFromClass = (ARRJavaPackage) k.next();
-					            	for (IPackageFragment mypackage2 : filteredClasspathPackages)
-					            		if(importedPackageFromClass.getName().equals(mypackage2.getElementName()))
-					            		{
-					            			dependencies.add(new CodeDependency(jClass,importedPackageFromClass,mypackage2.getJavaProject().getProject()));
-					            		}
-					            }
-					     }
-			        }
-			     }
+				ARRJavaPackage currentPackage = importedPackages.get(i);
+				//Para cada classe que esse pacote tem
+				for(int j = 0; j < currentPackage.getJavaPackage().getClasses().size(); j++)
+				{
+					JavaClass c = (JavaClass) currentPackage.getJavaPackage().getClasses().toArray()[j];
+					//Adiciona classe na lista de classes do projeto caso ela ainda não esteja lá.
+					if(!projectClasses.contains(c))
+		            	projectClasses.add(c);
+					
+					//Transforma os imports da classe em imports que eu posso trabalhar corretamente
+					ArrayList<ARRJavaPackage> classImports = new ArrayList<ARRJavaPackage>();
+		            for(int l = 0; l < c.getImportedPackages().size(); l++)
+		            	for (int m = 0; m < projectPackages.size(); m++)
+		            		if(projectPackages.get(m).getJavaPackage().getName().equals(((JavaPackage) c.getImportedPackages().toArray()[l]).getName()))
+		            			classImports.add(projectPackages.get(m));
+		            
+					
+					//Para cada pacote que essa classe importa
+					for(int k = 0; k < classImports.size(); k++)
+					{
+						ARRJavaPackage classImportedPackage = classImports.get(k);
+						//Cria dependência de classe -> pacote;
+						for (IPackageFragment parsedJavaCorePackage : filteredClasspathPackages)
+						{
+		            		if(classImportedPackage.getName().equals(parsedJavaCorePackage.getElementName()))
+		            		{
+		            			dependencies.add(new CodeDependency(c,classImportedPackage,parsedJavaCorePackage.getJavaProject().getProject()));
+		            		}
+						}
+					}
+					
+				}
 			}
+			
 			CodeDependencyMatrix fullDependencyMatrix = new CodeDependencyMatrix(projectClasses, projectPackages, dependencies);
 			fullDependencyMatrix.calculateMatrix();
 			
@@ -466,7 +480,7 @@ public class ProjectUtilities {
 		return getDependenciesFromProjects(projectsList);
 	}
 
-	public static ArrayList<AprioriOutput> getaOuts() {
+	public static ArrayList<AlgorithmOutput> getaOuts() {
 		return aOuts;
 	}
 	
@@ -474,7 +488,7 @@ public class ProjectUtilities {
 		aOuts.clear();
 	}
 
-	public static void setaOuts(ArrayList<AprioriOutput> aOuts) {
+	public static void setaOuts(ArrayList<AlgorithmOutput> aOuts) {
 		ProjectUtilities.aOuts = aOuts;
 	}
 }

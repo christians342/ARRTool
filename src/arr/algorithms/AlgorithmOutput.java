@@ -1,15 +1,15 @@
-package arr.apriori;
+package arr.algorithms;
 
 import java.util.ArrayList;
 
 import arr.general.ARRJavaPackage;
 
-public class AprioriOutput {
+public class AlgorithmOutput {
 	ArrayList<ARRJavaPackage> basePackages;
 	ArrayList<ARRJavaPackage> usedPackages;
 	double suport = 0.0;
 
-	public AprioriOutput(ArrayList<ARRJavaPackage> basePackages, ArrayList<ARRJavaPackage> jPackages, double suport)
+	public AlgorithmOutput(ArrayList<ARRJavaPackage> basePackages, ArrayList<ARRJavaPackage> jPackages, double suport)
 	{
 		this.basePackages = basePackages;
 		this.usedPackages = jPackages;
